@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Stethoscope,
   Timer,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -53,6 +54,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   {
     title: 'Clínico',
     items: [
+      {
+        href: '/portal/pacientes',
+        label: 'Pacientes',
+        icon: Users,
+        hint: 'Historia y evolución',
+        objective: 'RF-TR-03 · RNF-07',
+      },
       {
         href: '/portal/casos',
         label: 'Casos',

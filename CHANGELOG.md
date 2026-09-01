@@ -33,6 +33,20 @@ versionado con [SemVer](https://semver.org/lang/es/).
 
 ### Added
 
+- **Registro de pacientes e historia clínica longitudinal** (`/portal/pacientes` y
+  `/portal/pacientes/[id]`), bajo el grupo Clínico. El listado muestra nombre, edad, fototipo,
+  número de visitas, última visita y severidad actual, con búsqueda por nombre o código; la
+  historia añade tarjetas de resumen, la **curva de evolución IGA** y la cronología de visitas,
+  cada una desplegable con su fotografía, sus diagnósticos firmados, los tiempos de revisión de
+  ambas condiciones y la sugerencia del modelo.
+  Complementa la bandeja de casos en lugar de duplicarla: la bandeja está organizada en torno al
+  experimento, esta responde lo que se pregunta en un control clínico.
+- **`SeverityEvolution`** (`components/charts/severity-evolution.tsx`): línea de la severidad IGA
+  por visita. IGA es una escala **ordinal**, así que el eje traza el rango (0 sin lesiones … 4
+  severo) con las etiquetas clínicas en los ticks; el dibujo muestra dirección y escalones, y
+  nunca sugiere que la distancia entre «leve» y «moderado» equivalga a la de «moderado» y
+  «severo». El eje no se invierte: la severidad sube, de modo que una línea que baja se lee como
+  mejoría.
 - **Barra lateral colapsable** con las secciones agrupadas (Clínico · Análisis · Instrumentos ·
   Sistema), carril de iconos en escritorio y cajón en móvil. La preferencia de colapso persiste.
 - **Barra superior** reducida a lo esencial: título de la página, insignia de la condición

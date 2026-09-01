@@ -17,7 +17,7 @@ documento maestro:
 
 | Ruta | Experiencia |
 |---|---|
-| `/portal/**` | Portal del dermatólogo: casos, diagnóstico, indicadores, estadística, anexos, auditoría |
+| `/portal/**` | Portal del dermatólogo: pacientes e historia clínica, casos, diagnóstico, indicadores, estadística, anexos, auditoría |
 | `/app/**` | PWA del paciente: captura guiada de imagen e historial |
 
 > **Aviso:** Herramienta de apoyo diagnóstico con fines de investigación académica. No sustituye el
@@ -179,6 +179,7 @@ src/
 │  ├─ page.tsx              Portada con las dos experiencias
 │  ├─ login/                Autenticación
 │  ├─ portal/               Portal del dermatólogo
+│  │  ├─ pacientes/[id]/    Historia clínica longitudinal y curva de evolución IGA
 │  │  ├─ casos/[id]/        Ficha de caso: pretest y postest
 │  │  ├─ indicadores/       TRM · TPD · TSP · TCAD + boxplots + matriz de confusión
 │  │  ├─ estadistica/       HE₁–HE₄ y H₁ en un clic
@@ -189,7 +190,7 @@ src/
 │  └─ app/                  PWA del paciente
 ├─ components/
 │  ├─ ui/                   Button, Card, Badge, Field, Table, feedback
-│  ├─ charts/               Boxplot SVG propio, matriz de confusión, barras
+│  ├─ charts/               Boxplot SVG propio, matriz de confusión, barras, evolución IGA
 │  └─ portal/               Componentes específicos del portal
 ├─ lib/                     Cliente tipado, hooks, formato, catálogos
 └─ types/api-schema.d.ts    GENERADO — no editar a mano

@@ -158,8 +158,28 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Devuelve un paciente anonimizado. */
+        /** Devuelve un paciente. */
         get: operations["PatientsController_findOne"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/patients/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Historia clínica longitudinal del paciente.
+         * @description Cronología de visitas con la severidad IGA de cada una, los diagnósticos emitidos, los tiempos de revisión y las imágenes, más un resumen de evolución. Es la vista CLÍNICA: la bandeja de casos se organiza en torno al experimento, esta responde a lo que el dermatólogo pregunta en un control — cómo ha evolucionado este paciente. El bloque de IA llega en `null` cuando el solicitante opera en pretest (RF-TR-01).
+         */
+        get: operations["PatientsController_history"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1071,6 +1091,14 @@ export interface components {
             consentAcceptedAt: string | null;
             withdrawnAt: string | null;
             createdAt: string;
+            /** @description Número de casos clínicos registrados para este paciente. */
+            caseCount: number;
+            lastVisitAt: string | null;
+            /**
+             * @description Severidad más reciente según el juicio del especialista.
+             * @enum {string|null}
+             */
+            lastSeverity: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
         };
         CreatePatientDto: {
             /** @description Se almacena cifrado con AES-256-GCM (RF-TR-03). */
@@ -1091,22 +1119,52 @@ export interface components {
             /** @default 1.0 */
             consentVersion: string;
         };
-        PatientIdentityDto: {
-            fullName: string | null;
-            documentId: string | null;
+        PatientHistorySummaryDto: {
+            totalCases: number;
+            closedCases: number;
+            firstVisitAt: string | null;
+            lastVisitAt: string | null;
+            /** @enum {string|null} */
+            firstSeverity: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
+            /** @enum {string|null} */
+            lastSeverity: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
+            /**
+             * @description Comparación ordinal entre la primera y la última severidad. IGA es ordinal y un valor menor es mejor, de modo que una bajada es una mejoría.
+             * @enum {string}
+             */
+            trend: "mejora" | "estable" | "empeora" | "sin_datos";
+            /** @description Escalones IGA entre la primera y la última visita; negativo indica mejoría. */
+            severityDelta: number | null;
+            totalReviews: number;
+            averageReviewMinutes: number | null;
         };
-        Consent: {
+        HistoryDiagnosisDto: {
             id: string;
-            subjectType: Record<string, never>;
-            /** @description Patient id or user id, depending on `subjectType`. */
-            subjectId: string;
-            version: string;
-            accepted: boolean;
-            /** Format: date-time */
-            acceptedAt: string;
-            ipAddress: string | null;
+            /** @enum {string} */
+            studyMode: "pretest" | "postest" | "produccion";
+            /** @enum {string} */
+            igaClass: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo";
+            gagsScore: number | null;
             notes: string | null;
-            /** Format: date-time */
+            professional: string;
+            createdAt: string;
+        };
+        HistoryTimingDto: {
+            /** @enum {string} */
+            studyMode: "pretest" | "postest" | "produccion";
+            /** @description Instante de apertura de la ficha (t₀). */
+            t0: string;
+            /** @description TRᵢ en minutos. */
+            reviewMinutes: number | null;
+            valid: boolean;
+        };
+        HistoryInferenceDto: {
+            /** @enum {string|null} */
+            igaClass: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
+            confidence: number | null;
+            modelVersion: string;
+            /** @description `stub` indica que no proviene de una CNN entrenada. */
+            modelBackend: string;
             createdAt: string;
         };
         CaseImageDto: {
@@ -1124,6 +1182,56 @@ export interface components {
             createdAt: string;
             /** @description URL firmada con TTL de 15 minutos (RNF-02). */
             url: string;
+        };
+        HistoryEntryDto: {
+            caseId: string;
+            caseCode: string;
+            /** @enum {string} */
+            status: "draft" | "in_review" | "ai_processed" | "diagnosed" | "closed";
+            /**
+             * @description Condición en que se registró el caso.
+             * @enum {string}
+             */
+            studyMode: "pretest" | "postest" | "produccion";
+            /** @enum {string|null} */
+            groundTruthIga: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
+            isSynthetic: boolean;
+            createdAt: string;
+            closedAt: string | null;
+            /**
+             * @description Severidad clínicamente vinculante de esta visita: el juicio del especialista más reciente. Es lo que traza la curva de evolución.
+             * @enum {string|null}
+             */
+            severity: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
+            diagnoses: components["schemas"]["HistoryDiagnosisDto"][];
+            timings: components["schemas"]["HistoryTimingDto"][];
+            /** @description Siempre null cuando el solicitante opera en pretest (RF-TR-01). */
+            inference: components["schemas"]["HistoryInferenceDto"] | null;
+            images: components["schemas"]["CaseImageDto"][];
+        };
+        PatientHistoryDto: {
+            patient: components["schemas"]["PatientResponseDto"];
+            summary: components["schemas"]["PatientHistorySummaryDto"];
+            /** @description Visitas en orden cronológico ascendente. */
+            timeline: components["schemas"]["HistoryEntryDto"][];
+        };
+        PatientIdentityDto: {
+            fullName: string | null;
+            documentId: string | null;
+        };
+        Consent: {
+            id: string;
+            subjectType: Record<string, never>;
+            /** @description Patient id or user id, depending on `subjectType`. */
+            subjectId: string;
+            version: string;
+            accepted: boolean;
+            /** Format: date-time */
+            acceptedAt: string;
+            ipAddress: string | null;
+            notes: string | null;
+            /** Format: date-time */
+            createdAt: string;
         };
         AiInferenceDto: {
             id: string;
@@ -1930,6 +2038,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PatientResponseDto"];
+                };
+            };
+        };
+    };
+    PatientsController_history: {
+        parameters: {
+            query?: {
+                includeSynthetic?: boolean;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientHistoryDto"];
                 };
             };
         };
