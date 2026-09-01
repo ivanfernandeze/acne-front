@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Upload } from 'lucide-react';
+import { ArrowLeft, Search, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef, useState, type FormEvent } from 'react';
@@ -10,7 +10,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Field, Input, LabelledInput, Select } from '@/components/ui/field';
 import { Alert } from '@/components/ui/feedback';
 import { api, type GetResult, type PostResult } from '@/lib/api';
-import { useAction, useApi } from '@/lib/use-api';
+import { useAction, useApi, useDebouncedValue } from '@/lib/use-api';
 import { useCatalogs } from '@/lib/use-catalogs';
 
 type Patient = GetResult<'/patients'>[number];
@@ -37,8 +37,12 @@ export default function NuevoCasoPage() {
   const [groundTruth, setGroundTruth] = useState('');
   const [file, setFile] = useState<File | null>(null);
 
-  const existing = useApi<Patient[]>('/patients');
+  const [patientSearch, setPatientSearch] = useState('');
   const [existingPatientId, setExistingPatientId] = useState('');
+  const debouncedPatientSearch = useDebouncedValue(patientSearch.trim());
+  const existing = useApi<Patient[]>('/patients', {
+    search: debouncedPatientSearch === '' ? undefined : debouncedPatientSearch,
+  });
 
   const create = useAction(async () => {
     let patientId = existingPatientId;
@@ -98,19 +102,43 @@ export default function NuevoCasoPage() {
           <CardBody className="space-y-4">
             <Field
               label="Paciente ya registrado"
-              hint="Seleccione uno para registrar un caso adicional, o deje vacío para crear uno nuevo."
+              hint="Busque por nombre o por código. Deje el selector vacío para registrar un paciente nuevo."
             >
-              <Select
-                value={existingPatientId}
-                onChange={(event) => setExistingPatientId(event.target.value)}
-              >
-                <option value="">— Registrar paciente nuevo —</option>
-                {(existing.data ?? []).map((patient) => (
-                  <option key={patient.id} value={patient.id}>
-                    {patient.patientCode}
-                  </option>
-                ))}
-              </Select>
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search
+                    className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
+                    aria-hidden
+                  />
+                  <Input
+                    value={patientSearch}
+                    onChange={(event) => setPatientSearch(event.target.value)}
+                    placeholder="Buscar paciente por nombre o código…"
+                    className="pl-9"
+                    aria-label="Buscar paciente"
+                  />
+                </div>
+
+                <Select
+                  value={existingPatientId}
+                  onChange={(event) => setExistingPatientId(event.target.value)}
+                >
+                  <option value="">— Registrar paciente nuevo —</option>
+                  {(existing.data ?? []).map((patient) => (
+                    <option key={patient.id} value={patient.id}>
+                      {patient.fullName === null
+                        ? patient.patientCode
+                        : `${patient.fullName} · ${patient.patientCode}`}
+                    </option>
+                  ))}
+                </Select>
+
+                {patientSearch !== '' ? (
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {(existing.data ?? []).length} paciente(s) coinciden con «{patientSearch}».
+                  </p>
+                ) : null}
+              </div>
             </Field>
 
             {!usingExisting ? (

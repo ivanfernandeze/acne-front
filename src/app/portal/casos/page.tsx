@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, Plus } from 'lucide-react';
+import { ChevronRight, Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -8,12 +8,12 @@ import { useSession } from '@/components/session-provider';
 import { Badge, StudyModeBadge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button-variants';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
-import { Select } from '@/components/ui/field';
+import { Input, Select } from '@/components/ui/field';
 import { EmptyState, ErrorState, Loading } from '@/components/ui/feedback';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@/components/ui/table';
 import type { GetResult } from '@/lib/api';
 import { date } from '@/lib/format';
-import { useApi } from '@/lib/use-api';
+import { useApi, useDebouncedValue } from '@/lib/use-api';
 import { useCatalogs } from '@/lib/use-catalogs';
 
 type CaseSummary = GetResult<'/cases'>[number];
@@ -34,11 +34,14 @@ export default function CasosPage() {
   const [status, setStatus] = useState('');
   const [pending, setPending] = useState(false);
   const [includeSynthetic, setIncludeSynthetic] = useState(true);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search.trim());
 
   const cases = useApi<CaseSummary[]>('/cases', {
     status: status === '' ? undefined : status,
     pending: pending ? 'true' : undefined,
     includeSynthetic,
+    search: debouncedSearch === '' ? undefined : debouncedSearch,
   });
 
   return (
@@ -62,6 +65,20 @@ export default function CasosPage() {
           action={user !== null ? <StudyModeBadge mode={user.studyMode} /> : null}
         />
         <CardBody className="flex flex-wrap items-center gap-4">
+          <div className="relative min-w-64 flex-1">
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
+              aria-hidden
+            />
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Buscar por nombre del paciente o por código…"
+              className="pl-9"
+              aria-label="Buscar caso"
+            />
+          </div>
+
           <label className="flex items-center gap-2 text-sm">
             <span className="text-slate-500 dark:text-slate-400">Estado</span>
             <Select
@@ -107,7 +124,9 @@ export default function CasosPage() {
 
       <Card>
         <CardBody className="p-0">
-          {cases.loading ? (
+          {/* Only blank the area on the FIRST load. A refetch triggered by typing keeps the
+              previous rows on screen, so the list does not flash empty between keystrokes. */}
+          {cases.loading && cases.data === null ? (
             <Loading label="Cargando casos…" />
           ) : cases.error !== null ? (
             <div className="p-5">
@@ -145,7 +164,22 @@ export default function CasosPage() {
                         </Badge>
                       ) : null}
                     </Td>
-                    <Td className="font-mono text-xs text-slate-500 dark:text-slate-400">{item.patientCode}</Td>
+                    <Td>
+                      {item.patientName !== null ? (
+                        <>
+                          <span className="block text-sm text-slate-900 dark:text-slate-100">
+                            {item.patientName}
+                          </span>
+                          <span className="block font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                            {item.patientCode}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="font-mono text-xs text-slate-500 dark:text-slate-400">
+                          {item.patientCode}
+                        </span>
+                      )}
+                    </Td>
                     <Td>
                       <StudyModeBadge mode={item.studyMode} />
                     </Td>

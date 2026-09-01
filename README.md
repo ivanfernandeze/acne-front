@@ -154,6 +154,12 @@ menú y de otra en la cabecera.
 - **El formulario no preselecciona la sugerencia de la IA.** Rellenar la respuesta del médico con
   la del modelo convertiría el «diagnóstico asistido» en una confirmación, y la tasa de
   concordancia que mide OE2 dejaría de significar algo.
+- **El nombre del paciente se ve, el dato se mantiene anonimizado.** RF-TR-03 cifra la identidad y
+  la reserva al profesional tratante; no le pide trabajar a ciegas. La bandeja y el selector de
+  paciente muestran el nombre a `dermatologo`/`residente` — elegir de una lista de códigos es como
+  se abre el caso equivocado —, mientras que para `admin` y `evaluador_estadistico` llega en
+  `null`, y **anexos, exportaciones CSV y reportes PDF usan siempre el código**. Cada listado con
+  identidad deja una entrada en la traza de auditoría.
 - **Los datos sintéticos se marcan siempre.** Cuando el tablero incluye los 30 casos de
   demostración lo dice en un aviso; nunca se presentan como evidencia de la tesis.
 - **Las flechas de variación se juzgan por la dirección del indicador.** En TRM una bajada es

@@ -109,6 +109,11 @@ export default function CasoDetallePage() {
             {detail.caseCode}
           </h1>
           <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+            {detail.patientName !== null ? (
+              <span className="font-medium text-slate-900 dark:text-slate-100">
+                {detail.patientName}
+              </span>
+            ) : null}
             <span className="font-mono text-xs">{detail.patientCode}</span>
             <span aria-hidden>·</span>
             <Badge variant="neutral">

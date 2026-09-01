@@ -134,7 +134,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Lista pacientes anonimizados. */
+        /**
+         * Lista pacientes.
+         * @description Para `dermatologo` y `residente` incluye el nombre descifrado, porque elegir un paciente de una lista de códigos es como se abre el caso equivocado (RF-TR-03 reserva la identidad al profesional tratante, no le pide trabajar a ciegas). Para los demás roles `fullName` llega en `null`. El acceso en bloque queda registrado en la traza de auditoría (RNF-02).
+         */
         get: operations["PatientsController_findAll"];
         put?: never;
         /**
@@ -513,7 +516,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Bandeja de casos con filtro por modo de estudio (Sección 9.3). */
+        /**
+         * Bandeja de casos con filtro por modo de estudio (Sección 9.3).
+         * @description Para `dermatologo` y `residente` cada caso incluye `patientName` descifrado, de modo que la bandeja se pueda leer por nombre y no solo por código (RF-TR-03). Para el resto de roles llega en `null`.
+         */
         get: operations["CasesController_findAll"];
         put?: never;
         /**
@@ -1054,6 +1060,8 @@ export interface components {
             id: string;
             /** @description Identificador anonimizado, p. ej. PAC-2026-0001. */
             patientCode: string;
+            /** @description Nombre descifrado. Solo se rellena para `dermatologo` y `residente`; para el resto de roles llega en `null`, de modo que la anonimización de RF-TR-03 se mantiene. */
+            fullName: string | null;
             birthDate: string | null;
             ageYears: number | null;
             /** @enum {string|null} */
@@ -1312,6 +1320,8 @@ export interface components {
             caseCode: string;
             patientId: string;
             patientCode: string;
+            /** @description Nombre del paciente, descifrado solo para `dermatologo` y `residente` (RF-TR-03). Para el resto de roles llega en `null`; los anexos, exportaciones y reportes usan siempre el código, nunca el nombre. */
+            patientName: string | null;
             assignedUserId: string | null;
             assignedUserName: string | null;
             /** @enum {string} */
@@ -1355,6 +1365,8 @@ export interface components {
             caseCode: string;
             patientId: string;
             patientCode: string;
+            /** @description Nombre del paciente, descifrado solo para `dermatologo` y `residente` (RF-TR-03). Para el resto de roles llega en `null`; los anexos, exportaciones y reportes usan siempre el código, nunca el nombre. */
+            patientName: string | null;
             assignedUserId: string | null;
             assignedUserName: string | null;
             /** @enum {string} */
@@ -1859,6 +1871,8 @@ export interface operations {
         parameters: {
             query?: {
                 includeWithdrawn?: boolean;
+                /** @description Filtra por nombre o por código. Solo surte efecto para roles asistenciales. */
+                search?: string;
             };
             header?: never;
             path?: never;
@@ -2361,6 +2375,8 @@ export interface operations {
                 includeSynthetic?: boolean;
                 /** @description Deja solo los casos que aún no tienen medición bajo la condición actual del usuario. Es la bandeja de trabajo real: primero la pasada de pretest sobre los 30 casos, después la de postest sobre esos mismos 30. */
                 pending?: boolean;
+                /** @description Busca por código de caso, código de paciente o nombre del paciente. */
+                search?: string;
             };
             header?: never;
             path?: never;
