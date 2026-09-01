@@ -34,7 +34,7 @@ export default function LoginPage() {
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-6 py-12">
       <div className="space-y-2 text-center">
         <Activity className="mx-auto h-8 w-8 text-sky-900 dark:text-sky-400" aria-hidden />
-        <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">
+        <h1 className="font-(family-name:--font-poppins) text-xl font-bold text-slate-900 dark:text-slate-100">
           Diagnóstico asistido de acné
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">

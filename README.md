@@ -54,7 +54,12 @@ directivas `@tailwind` más las variables del tema en `:root`/`.dark`; en este p
 ```css
 /* src/app/globals.css — el archivo completo */
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 ```
+
+La segunda línea no es decoración: Tailwind v4 compila `dark:` como
+`@media (prefers-color-scheme: dark)` y JavaScript no puede sobrescribir una media query. Atar la
+variante a una clase es lo único que permite ofrecer un conmutador manual Claro / Oscuro / Sistema.
 
 - **No hay tema propio ni variables CSS.** Los componentes usan la paleta que trae Tailwind
   (`bg-white`, `text-slate-900`, `bg-sky-900`, `dark:bg-slate-900`…). No existe
@@ -74,12 +79,22 @@ directivas `@tailwind` más las variables del tema en `:root`/`.dark`; en este p
 pnpm lint:css
 ```
 
-`scripts/check-no-custom-css.mjs` exige que `globals.css` contenga **exactamente** esa línea y
-nada más, y que no exista ningún otro CSS. Falla con un mensaje concreto y está conectado al CI.
+`scripts/check-no-custom-css.mjs` exige que `globals.css` contenga **exactamente** esas dos líneas
+y nada más, y que no exista ningún otro CSS. Falla con un mensaje concreto y está conectado al CI.
 
-> **Modo oscuro:** al no haber configuración, `dark:` responde a la preferencia del sistema
-> operativo (`prefers-color-scheme`), no a una clase. Un conmutador manual exigiría un
-> `@custom-variant` en el CSS, que esta política no permite.
+### Modo claro / oscuro
+
+Conmutador de tres estados en la barra superior: **Claro · Oscuro · Sistema**. `system` es un
+estado real, no un sinónimo del tema actual del sistema operativo: si el usuario lo elige, el
+portal sigue al SO aunque este cambie a mitad de sesión; si elige claro u oscuro, no.
+
+- La elección se guarda en `localStorage`.
+- Un script en línea en `<head>` aplica el tema **antes del primer pintado**, para que quien use
+  oscuro no vea un destello blanco al cargar.
+- Se fija también `color-scheme` en el elemento raíz, de modo que barras de desplazamiento y
+  controles nativos acompañen al tema.
+- Los gráficos de Recharts leen el tema resuelto y cambian su paleta: sin eso, el tooltip sería
+  una caja blanca sobre una página oscura.
 
 ### 2. Cero tipos escritos a mano
 
@@ -103,6 +118,30 @@ verbatim, las fórmulas y metas de los indicadores. Eso llega por `GET /meta/cat
 (`useCatalogs`), así que el cuestionario validado existe una sola vez en todo el sistema.
 
 ---
+
+## Estructura de navegación
+
+Barra lateral fija y colapsable, con las secciones agrupadas por cómo se trabaja realmente el
+estudio:
+
+| Grupo | Secciones | Objetivo |
+|---|---|---|
+| — | Resumen | Estado general |
+| **Clínico** | Casos · Jornada | OE1 · OE2 · OE4 |
+| **Análisis** | Indicadores · Estadística | OE1–OE4 · OG |
+| **Instrumentos** | Anexos · Encuesta | OE1 · OE2 · OE3 · OE4 |
+| **Sistema** | Auditoría | RNF-04 · RF-TR-04 |
+
+- Colapsa a un carril de iconos; la preferencia se recuerda. Los iconos conservan su `title`,
+  porque un carril sin forma de recuperar el significado es una trampa para un usuario ocasional
+  — que es exactamente lo que es un jurado de tesis.
+- En móvil se abre como cajón, siempre expandido.
+- La barra superior queda con lo que debe verse en toda pantalla: dónde estás, **bajo qué
+  condición experimental estás registrando**, el tema y quién eres.
+
+`src/components/portal/navigation.ts` es la definición única: el sider la renderiza y la barra
+superior deriva de ella el título, así que una ruta no puede quedar etiquetada de una forma en el
+menú y de otra en la cabecera.
 
 ## Decisiones de interfaz que protegen el experimento
 

@@ -63,7 +63,7 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-2 px-6 py-12 text-center">
-      <p className="font-[family-name:var(--font-poppins)] text-sm font-semibold text-slate-900 dark:text-slate-100">{title}</p>
+      <p className="font-(family-name:--font-poppins) text-sm font-semibold text-slate-900 dark:text-slate-100">{title}</p>
       {description !== undefined ? (
         <p className="max-w-md text-sm text-slate-500 dark:text-slate-400">{description}</p>
       ) : null}
@@ -100,7 +100,7 @@ export function StudyModeBlocked({ children }: { children?: ReactNode }) {
     <div className="flex gap-3 rounded-md border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 px-4 py-4 text-sm">
       <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-slate-500 dark:text-slate-400" aria-hidden />
       <div className="space-y-1.5">
-        <p className="font-[family-name:var(--font-poppins)] font-semibold text-slate-900 dark:text-slate-100">
+        <p className="font-(family-name:--font-poppins) font-semibold text-slate-900 dark:text-slate-100">
           Módulo de IA bloqueado — modo pretest (IIA = 0)
         </p>
         <p className="text-slate-500 dark:text-slate-400">

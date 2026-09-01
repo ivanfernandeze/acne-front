@@ -16,7 +16,7 @@ export default function HomePage() {
           <Activity className="h-4 w-4" aria-hidden />
           Universidad Nacional de Trujillo · Ingeniería de Sistemas · 2026
         </p>
-        <h1 className="font-[family-name:var(--font-poppins)] text-3xl font-bold text-slate-900 dark:text-slate-100">
+        <h1 className="font-(family-name:--font-poppins) text-3xl font-bold text-slate-900 dark:text-slate-100">
           Diagnóstico asistido de acné con inteligencia artificial
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -31,7 +31,7 @@ export default function HomePage() {
           className="group rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 transition-colors hover:border-sky-900 dark:hover:border-sky-400"
         >
           <Stethoscope className="h-6 w-6 text-sky-900 dark:text-sky-400" aria-hidden />
-          <h2 className="mt-3 font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="mt-3 font-(family-name:--font-poppins) text-base font-semibold text-slate-900 dark:text-slate-100">
             Portal del dermatólogo
           </h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -48,7 +48,7 @@ export default function HomePage() {
           className="group rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 transition-colors hover:border-cyan-700 dark:hover:border-cyan-400"
         >
           <Camera className="h-6 w-6 text-cyan-700 dark:text-cyan-400" aria-hidden />
-          <h2 className="mt-3 font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="mt-3 font-(family-name:--font-poppins) text-base font-semibold text-slate-900 dark:text-slate-100">
             App del paciente
           </h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">

@@ -87,7 +87,7 @@ export default function NuevoCasoPage() {
         Volver a la bandeja
       </Link>
 
-      <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">Nuevo caso clínico</h1>
+      <h1 className="font-(family-name:--font-poppins) text-xl font-bold text-slate-900 dark:text-slate-100">Nuevo caso clínico</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <Card>

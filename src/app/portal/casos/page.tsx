@@ -45,7 +45,7 @@ export default function CasosPage() {
     <div className="space-y-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">Bandeja de casos</h1>
+          <h1 className="font-(family-name:--font-poppins) text-xl font-bold text-slate-900 dark:text-slate-100">Bandeja de casos</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Cada caso se mide dos veces: una sin IA (O₁) y otra con IA (O₂). Es su propio control.
           </p>

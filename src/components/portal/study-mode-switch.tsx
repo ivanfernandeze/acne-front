@@ -76,7 +76,7 @@ export function StudyModeSwitch() {
 
       {open ? (
         <div className="absolute right-0 z-30 mt-2 w-80 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-lg">
-          <p className="font-[family-name:var(--font-poppins)] text-sm font-semibold text-slate-900 dark:text-slate-100">Modo de estudio</p>
+          <p className="font-(family-name:--font-poppins) text-sm font-semibold text-slate-900 dark:text-slate-100">Modo de estudio</p>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Determina la condición experimental bajo la que se registran sus mediciones. Pasar de
             pretest a postest equivale a aplicar la intervención X del diseño y queda registrado en

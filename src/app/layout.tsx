@@ -3,6 +3,7 @@ import { Inter, Poppins } from 'next/font/google';
 import type { ReactNode } from 'react';
 
 import { SessionProvider } from '@/components/session-provider';
+import { THEME_INIT_SCRIPT, ThemeProvider } from '@/components/theme-provider';
 
 import './globals.css';
 
@@ -47,9 +48,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="es-PE" className={`${inter.variable} ${poppins.variable}`}>
-      <body className="min-h-screen bg-slate-50 dark:bg-slate-950 font-[family-name:var(--font-inter)] text-slate-900 dark:text-slate-100 antialiased">
-        <SessionProvider>{children}</SessionProvider>
+    <html lang="es-PE" className={`${inter.variable} ${poppins.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Applies the stored theme before the first paint, so a user on dark never sees a
+            white flash. It has to be inline: nothing else runs early enough. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="min-h-screen bg-slate-50 dark:bg-slate-950 font-(family-name:--font-inter) text-slate-900 dark:text-slate-100 antialiased">
+        <ThemeProvider>
+          <SessionProvider>{children}</SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import { useSession } from '@/components/session-provider';
 import { IndicatorCard } from '@/components/portal/indicator-card';
-import { Badge, StudyModeBadge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button-variants';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Alert, Loading } from '@/components/ui/feedback';
@@ -46,7 +46,7 @@ export default function PortalHomePage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">
+          <h1 className="font-(family-name:--font-poppins) text-xl font-bold text-slate-900 dark:text-slate-100">
             Hola, {user?.fullName ?? ''}
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -54,7 +54,6 @@ export default function PortalHomePage() {
             casos.
           </p>
         </div>
-        {user !== null ? <StudyModeBadge mode={user.studyMode} /> : null}
       </header>
 
       {survey.data?.due === true ? (
@@ -82,7 +81,7 @@ export default function PortalHomePage() {
       ) : null}
 
       <section>
-        <h2 className="mb-3 font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">
+        <h2 className="mb-3 font-(family-name:--font-poppins) text-base font-semibold text-slate-900 dark:text-slate-100">
           Indicadores de la variable dependiente
         </h2>
         {dashboard.loading ? (

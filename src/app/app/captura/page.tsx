@@ -108,7 +108,7 @@ export default function CapturaPage() {
       <Card>
         <CardBody className="space-y-4">
           <div className="space-y-1">
-            <h2 className="font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">
+            <h2 className="font-(family-name:--font-poppins) text-base font-semibold text-slate-900 dark:text-slate-100">
               Guía de encuadre
             </h2>
             <ul className="list-disc space-y-0.5 pl-4 text-sm text-slate-500 dark:text-slate-400">

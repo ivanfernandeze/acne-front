@@ -41,7 +41,7 @@ export default function IndicadoresPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">
+          <h1 className="font-(family-name:--font-poppins) text-xl font-bold text-slate-900 dark:text-slate-100">
             Indicadores de la variable dependiente
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -278,7 +278,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2">
       <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-      <p className="font-[family-name:var(--font-poppins)] text-lg font-semibold tabular-nums text-slate-900 dark:text-slate-100">{value}</p>
+      <p className="font-(family-name:--font-poppins) text-lg font-semibold tabular-nums text-slate-900 dark:text-slate-100">{value}</p>
     </div>
   );
 }

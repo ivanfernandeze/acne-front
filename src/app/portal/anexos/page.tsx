@@ -53,7 +53,7 @@ export default function AnexosPage() {
     <div className="space-y-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">
+          <h1 className="font-(family-name:--font-poppins) text-xl font-bold text-slate-900 dark:text-slate-100">
             Instrumentos digitalizados
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">

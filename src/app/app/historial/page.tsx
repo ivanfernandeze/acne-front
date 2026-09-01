@@ -24,7 +24,7 @@ export default function HistorialPage() {
       <Card>
         <CardBody className="space-y-3 text-center">
           <Clock className="mx-auto h-7 w-7 text-slate-500 dark:text-slate-400" aria-hidden />
-          <h2 className="font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="font-(family-name:--font-poppins) text-base font-semibold text-slate-900 dark:text-slate-100">
             Historial no disponible todavía
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">

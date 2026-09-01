@@ -10,7 +10,7 @@ export default function PatientHomePage() {
       <Card>
         <CardBody className="space-y-3">
           <Camera className="h-7 w-7 text-cyan-700 dark:text-cyan-400" aria-hidden />
-          <h2 className="font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="font-(family-name:--font-poppins) text-base font-semibold text-slate-900 dark:text-slate-100">
             Enviar una fotografía
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -26,7 +26,7 @@ export default function PatientHomePage() {
       <Card>
         <CardBody className="space-y-3">
           <ClipboardList className="h-6 w-6 text-sky-900 dark:text-sky-400" aria-hidden />
-          <h2 className="font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="font-(family-name:--font-poppins) text-base font-semibold text-slate-900 dark:text-slate-100">
             Historial de mis casos
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">

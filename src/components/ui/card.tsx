@@ -30,7 +30,7 @@ export function CardHeader({
       )}
     >
       <div className="min-w-0">
-        <h2 className="font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
+        <h2 className="font-(family-name:--font-poppins) text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
         {description !== undefined ? (
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
         ) : null}

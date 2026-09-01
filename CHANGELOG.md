@@ -31,6 +31,20 @@ versionado con [SemVer](https://semver.org/lang/es/).
   el reporte imprimía «8,78» — una invitación a errores de transcripción en el capítulo de
   resultados. El locale se fija ahora a la convención del documento, no a la del país.
 
+### Added
+
+- **Barra lateral colapsable** con las secciones agrupadas (Clínico · Análisis · Instrumentos ·
+  Sistema), carril de iconos en escritorio y cajón en móvil. La preferencia de colapso persiste.
+- **Barra superior** reducida a lo esencial: título de la página, insignia de la condición
+  experimental, conmutador de tema y usuario. La insignia vive aquí a propósito: es el único
+  estado que cambia lo que el profesional puede ver, y esconderlo en un menú permitiría
+  diagnosticar sin advertir a qué observación se está contribuyendo.
+- **Tema claro / oscuro / sistema** con conmutador de tres estados, persistencia en
+  `localStorage` y script en línea que evita el destello blanco al cargar. Disponible también en
+  la PWA del paciente.
+- `src/components/portal/navigation.ts` como definición única de la navegación: el sider y el
+  título de la barra superior salen de la misma fuente.
+
 ### Changed
 
 - **Migración a Tailwind CSS v4 sin tema propio.** `globals.css` se reduce a

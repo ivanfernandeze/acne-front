@@ -2,10 +2,14 @@
 /**
  * Enforces the Tailwind-only policy.
  *
- * The rule for this project is stricter than the specification's baseline: `src/app/globals.css`
- * must contain the Tailwind import and NOTHING else — no theme block, no CSS variables, no
- * selectors. Every colour, spacing and font decision lives in utility classes inside the JSX,
- * using Tailwind's own palette.
+ * `src/app/globals.css` may contain exactly two lines and nothing else: the Tailwind import and
+ * the declaration of the `dark` variant. No theme block, no CSS variables, no selectors — every
+ * colour, spacing and font decision lives in utility classes inside the JSX, using Tailwind's own
+ * palette.
+ *
+ * The second line is not decoration: Tailwind v4 compiles `dark:` to
+ * `@media (prefers-color-scheme: dark)` by default, which JavaScript cannot override. Binding the
+ * variant to a class is the only way to offer a manual Light / Dark / System switch.
  *
  * A convention that is not enforced is a convention that decays, so this runs in CI.
  *
@@ -21,7 +25,10 @@ const SCAN_DIRS = ['src', 'public', 'app'];
 const IGNORED_DIRS = new Set(['node_modules', '.next', 'dist', 'coverage', '.git']);
 
 const ALLOWED_STYLESHEET = join('src', 'app', 'globals.css');
-const ALLOWED_CONTENT = '@import "tailwindcss";';
+const ALLOWED_LINES = [
+  '@import "tailwindcss";',
+  '@custom-variant dark (&:where(.dark, .dark *));',
+];
 const STYLE_EXTENSIONS = /\.(css|scss|sass|less)$/i;
 
 const errors = [];
@@ -58,12 +65,17 @@ function inspect(absolutePath) {
     .map((line) => line.trim())
     .filter((line) => line !== '');
 
-  if (lines.length !== 1 || lines[0] !== ALLOWED_CONTENT) {
+  const matches =
+    lines.length === ALLOWED_LINES.length &&
+    lines.every((line, index) => line === ALLOWED_LINES[index]);
+
+  if (!matches) {
     errors.push(
-      `${relativePath}: debe contener exactamente \`${ALLOWED_CONTENT}\` y nada más ` +
-        `(se encontraron ${lines.length} línea(s) con contenido). Sin variables de tema, sin ` +
-        `bloques \`@theme\`, sin selectores: el tema son las clases de utilidad de Tailwind ` +
-        `escritas en los componentes.`,
+      `${relativePath}: debe contener exactamente estas ${ALLOWED_LINES.length} líneas y nada ` +
+        `más:\n      ${ALLOWED_LINES.join('\n      ')}\n    Se encontraron ` +
+        `${lines.length} línea(s) con contenido. Sin variables de tema, sin bloques \`@theme\`, ` +
+        `sin selectores: el tema son las clases de utilidad de Tailwind escritas en los ` +
+        `componentes.`,
     );
   }
 }
@@ -83,5 +95,5 @@ if (errors.length > 0) {
 
 console.log(
   `✓ Política Tailwind-only respetada: ${ALLOWED_STYLESHEET.split(sep).join('/')} contiene solo ` +
-    `\`${ALLOWED_CONTENT}\` y no existe ningún otro CSS.`,
+    `sus ${ALLOWED_LINES.length} líneas permitidas y no existe ningún otro CSS.`,
 );

@@ -49,13 +49,12 @@ export default function JornadaPage() {
     <div className="space-y-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">Jornada de trabajo</h1>
+          <h1 className="font-(family-name:--font-poppins) text-xl font-bold text-slate-900 dark:text-slate-100">Jornada de trabajo</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Anexo 7 · TCAD = NCR / TJ. El sistema cuenta los casos revisados; usted declara la
             duración de la jornada.
           </p>
         </div>
-        {user !== null ? <StudyModeBadge mode={user.studyMode} /> : null}
       </header>
 
       <Card>
@@ -184,7 +183,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2">
       <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-      <p className="font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">{value}</p>
+      <p className="font-(family-name:--font-poppins) text-base font-semibold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
   );
 }

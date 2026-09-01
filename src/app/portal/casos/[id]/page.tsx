@@ -105,7 +105,7 @@ export default function CasoDetallePage() {
             <ArrowLeft className="h-4 w-4" aria-hidden />
             Volver a la bandeja
           </Link>
-          <h1 className="mt-1 font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">
+          <h1 className="mt-1 font-(family-name:--font-poppins) text-xl font-bold text-slate-900 dark:text-slate-100">
             {detail.caseCode}
           </h1>
           <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
@@ -117,7 +117,6 @@ export default function CasoDetallePage() {
             {detail.isSynthetic ? <Badge variant="outline">sintético</Badge> : null}
           </p>
         </div>
-        {user !== null ? <StudyModeBadge mode={user.studyMode} /> : null}
       </header>
 
       <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
@@ -231,13 +230,13 @@ export default function CasoDetallePage() {
                   <div className="flex flex-wrap items-end gap-4">
                     <div>
                       <p className="text-xs text-slate-500 dark:text-slate-400">Clase IGA sugerida</p>
-                      <p className="font-[family-name:var(--font-poppins)] text-2xl font-bold text-cyan-700 dark:text-cyan-400">
+                      <p className="font-(family-name:--font-poppins) text-2xl font-bold text-cyan-700 dark:text-cyan-400">
                         {igaLabel(catalogs, detail.inference.igaClass)}
                       </p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 dark:text-slate-400">Confianza</p>
-                      <p className="font-[family-name:var(--font-poppins)] text-xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">
+                      <p className="font-(family-name:--font-poppins) text-xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">
                         {detail.inference.confidence === null
                           ? '—'
                           : pct(detail.inference.confidence * 100)}
@@ -290,7 +289,7 @@ export default function CasoDetallePage() {
           {alreadyDiagnosed ? (
             <Card className="border-emerald-600/50 dark:border-emerald-400/50">
               <CardBody className="space-y-3">
-                <p className="flex items-center gap-2 font-[family-name:var(--font-poppins)] text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+                <p className="flex items-center gap-2 font-(family-name:--font-poppins) text-sm font-semibold text-emerald-700 dark:text-emerald-400">
                   <CheckCircle2 className="h-5 w-5" aria-hidden />
                   Caso ya diagnosticado en esta condición
                 </p>

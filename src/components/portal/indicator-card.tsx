@@ -38,7 +38,7 @@ export function IndicatorCard({ data }: { data: IndicatorComparison }) {
               <span aria-hidden>·</span>
               {data.indicator}
             </p>
-            <h3 className="mt-0.5 truncate font-[family-name:var(--font-poppins)] text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <h3 className="mt-0.5 truncate font-(family-name:--font-poppins) text-sm font-semibold text-slate-900 dark:text-slate-100">
               {definition.name}
             </h3>
           </div>
@@ -54,13 +54,13 @@ export function IndicatorCard({ data }: { data: IndicatorComparison }) {
         <div className="flex items-end gap-4">
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400">Pretest</p>
-            <p className="font-[family-name:var(--font-poppins)] text-xl font-semibold tabular-nums text-slate-500 dark:text-slate-400">
+            <p className="font-(family-name:--font-poppins) text-xl font-semibold tabular-nums text-slate-500 dark:text-slate-400">
               {data.pretest === null ? '—' : num(data.pretest.value)}
             </p>
           </div>
           <div>
             <p className="text-xs text-slate-500 dark:text-slate-400">Postest</p>
-            <p className="font-[family-name:var(--font-poppins)] text-2xl font-bold tabular-nums text-cyan-700 dark:text-cyan-400">
+            <p className="font-(family-name:--font-poppins) text-2xl font-bold tabular-nums text-cyan-700 dark:text-cyan-400">
               {data.postest === null ? '—' : num(data.postest.value)}
             </p>
           </div>

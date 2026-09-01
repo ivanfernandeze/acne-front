@@ -21,7 +21,7 @@ export default function AuditoriaPage() {
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">Auditoría de la tesis</h1>
+        <h1 className="font-(family-name:--font-poppins) text-xl font-bold text-slate-900 dark:text-slate-100">Auditoría de la tesis</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Matriz de cobertura de objetivos y verificación de la variable independiente.
         </p>
@@ -214,7 +214,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2">
       <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-      <p className="font-[family-name:var(--font-poppins)] text-sm font-semibold text-slate-900 dark:text-slate-100">{value}</p>
+      <p className="font-(family-name:--font-poppins) text-sm font-semibold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
   );
 }
