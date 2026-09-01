@@ -40,8 +40,8 @@ export default function EstadisticaPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-xl font-bold text-foreground">Análisis estadístico</h1>
-          <p className="mt-1 text-sm text-muted">
+          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">Análisis estadístico</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Shapiro-Wilk sobre las diferencias pareadas → t de Student para muestras relacionadas o
             Wilcoxon de rangos con signo, según normalidad. α = 0,05.
           </p>
@@ -66,12 +66,12 @@ export default function EstadisticaPage() {
         </div>
       </header>
 
-      <label className="flex w-fit items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-sm">
+      <label className="flex w-fit items-center gap-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm">
         <input
           type="checkbox"
           checked={includeSynthetic}
           onChange={(event) => setIncludeSynthetic(event.target.checked)}
-          className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+          className="h-4 w-4 rounded border-slate-200 dark:border-slate-700 text-sky-900 dark:text-sky-400 focus:ring-sky-900 dark:focus:ring-sky-400"
         />
         Incluir datos sintéticos de demostración
       </label>
@@ -85,7 +85,7 @@ export default function EstadisticaPage() {
       {result === null ? (
         <Card>
           <CardBody>
-            <p className="py-8 text-center text-sm text-muted">
+            <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
               Pulse <strong>Contrastar HE₁–HE₄</strong> para ejecutar las cuatro pruebas y derivar
               la conclusión sobre la hipótesis general H₁.
             </p>
@@ -93,7 +93,7 @@ export default function EstadisticaPage() {
         </Card>
       ) : (
         <>
-          <Card className={result.rejectsNull ? 'border-success/50' : 'border-warning/50'}>
+          <Card className={result.rejectsNull ? 'border-emerald-600/50 dark:border-emerald-400/50' : 'border-amber-500/50 dark:border-amber-400/50'}>
             <CardHeader
               title="Hipótesis general (OG)"
               action={
@@ -104,14 +104,14 @@ export default function EstadisticaPage() {
             />
             <CardBody className="space-y-3 text-sm">
               <p>
-                <strong className="text-foreground">H₁:</strong>{' '}
-                <span className="text-muted">{result.h1}</span>
+                <strong className="text-slate-900 dark:text-slate-100">H₁:</strong>{' '}
+                <span className="text-slate-500 dark:text-slate-400">{result.h1}</span>
               </p>
               <p>
-                <strong className="text-foreground">H₀:</strong>{' '}
-                <span className="text-muted">{result.h0}</span>
+                <strong className="text-slate-900 dark:text-slate-100">H₀:</strong>{' '}
+                <span className="text-slate-500 dark:text-slate-400">{result.h0}</span>
               </p>
-              <p className="rounded-md border-l-4 border-primary bg-primary-soft px-4 py-3 text-foreground">
+              <p className="rounded-md border-l-4 border-sky-900 dark:border-sky-400 bg-sky-50 dark:bg-sky-950 px-4 py-3 text-slate-900 dark:text-slate-100">
                 {result.conclusion}
               </p>
             </CardBody>
@@ -150,14 +150,14 @@ export default function EstadisticaPage() {
                             <br />
                             <span
                               className={
-                                test.normality.normal ? 'text-success' : 'text-warning'
+                                test.normality.normal ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
                               }
                             >
                               {test.normality.normal ? 'Normal' : 'No normal'}
                             </span>
                           </span>
                         ) : (
-                          <span className="text-xs text-muted">No aplicable</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">No aplicable</span>
                         )}
                       </Td>
                       <Td className="text-xs">{test.testLabel}</Td>
@@ -198,8 +198,8 @@ export default function EstadisticaPage() {
                 </div>
 
                 {test.effectSize !== null ? (
-                  <p className="text-sm text-muted">
-                    <strong className="text-foreground">Tamaño del efecto:</strong>{' '}
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <strong className="text-slate-900 dark:text-slate-100">Tamaño del efecto:</strong>{' '}
                     {test.effectSize.kind} = {num(test.effectSize.value, 4)} (
                     {test.effectSize.magnitude})
                   </p>
@@ -209,16 +209,16 @@ export default function EstadisticaPage() {
                   <Alert tone="info">{test.normality.note}</Alert>
                 ) : null}
 
-                <p className="rounded-md border-l-4 border-primary bg-primary-soft px-4 py-3 text-sm text-foreground">
+                <p className="rounded-md border-l-4 border-sky-900 dark:border-sky-400 bg-sky-50 dark:bg-sky-950 px-4 py-3 text-sm text-slate-900 dark:text-slate-100">
                   {test.conclusion}
                 </p>
 
-                <details className="rounded-md border border-border">
-                  <summary className="cursor-pointer px-4 py-2 text-sm font-medium text-foreground">
+                <details className="rounded-md border border-slate-200 dark:border-slate-700">
+                  <summary className="cursor-pointer px-4 py-2 text-sm font-medium text-slate-900 dark:text-slate-100">
                     Datos pareados ({test.pairs.length}) y trazabilidad
                   </summary>
-                  <div className="border-t border-border px-4 py-3">
-                    <p className="mb-3 text-xs text-muted">
+                  <div className="border-t border-slate-200 dark:border-slate-700 px-4 py-3">
+                    <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
                       Ejecución <code>{test.id}</code> · semilla {test.seed} · función{' '}
                       {test.functionVersion} · hash de insumos{' '}
                       <code>{test.inputHash.slice(0, 16)}…</code> (RNF-05)
@@ -250,7 +250,7 @@ export default function EstadisticaPage() {
           ))}
 
           {catalogs !== null ? (
-            <p className="text-xs text-muted">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Referencia metodológica: {catalogs.references.find((r) => r.startsWith('Hernández'))}
             </p>
           ) : null}
@@ -262,9 +262,9 @@ export default function EstadisticaPage() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-border px-3 py-2">
-      <p className="text-xs text-muted">{label}</p>
-      <p className="font-display text-lg font-semibold tabular-nums text-foreground">{value}</p>
+    <div className="rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2">
+      <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="font-[family-name:var(--font-poppins)] text-lg font-semibold tabular-nums text-slate-900 dark:text-slate-100">{value}</p>
     </div>
   );
 }

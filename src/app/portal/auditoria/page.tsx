@@ -21,13 +21,13 @@ export default function AuditoriaPage() {
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="font-display text-xl font-bold text-foreground">Auditoría de la tesis</h1>
-        <p className="mt-1 text-sm text-muted">
+        <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">Auditoría de la tesis</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Matriz de cobertura de objetivos y verificación de la variable independiente.
         </p>
       </header>
 
-      <Card className={iia.data?.operational === true ? 'border-success/50' : 'border-warning/50'}>
+      <Card className={iia.data?.operational === true ? 'border-emerald-600/50 dark:border-emerald-400/50' : 'border-amber-500/50 dark:border-amber-400/50'}>
         <CardHeader
           title="Verificación de la variable independiente (IIA)"
           description="Instrumento que valida IIA = 1: la ficha técnica de operatividad del modelo."
@@ -47,7 +47,7 @@ export default function AuditoriaPage() {
           {iia.loading ? (
             <Loading />
           ) : iia.data === null ? (
-            <p className="text-sm text-muted">No se pudo contactar al motor de IA.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">No se pudo contactar al motor de IA.</p>
           ) : (
             <>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -85,7 +85,7 @@ export default function AuditoriaPage() {
               </div>
 
               {iia.data.weightsChecksum !== null ? (
-                <p className="text-xs text-muted">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Checksum de pesos: <code>{iia.data.weightsChecksum.slice(0, 24)}…</code>
                 </p>
               ) : null}
@@ -100,7 +100,7 @@ export default function AuditoriaPage() {
                 </Alert>
               ) : null}
 
-              <p className="text-xs text-muted">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Verificado el {dateTime(iia.data.checkedAt)}.
               </p>
             </>
@@ -130,7 +130,7 @@ export default function AuditoriaPage() {
           {coverage.loading ? (
             <Loading />
           ) : coverage.data === null ? (
-            <p className="text-sm text-muted">Sin datos.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Sin datos.</p>
           ) : (
             <>
               {coverage.data.blockers.length > 0 ? (
@@ -162,12 +162,12 @@ export default function AuditoriaPage() {
                   {coverage.data.entries.map((entry) => (
                     <Tr key={entry.objective}>
                       <Td>
-                        <span className="font-medium text-foreground">{entry.objective}</span>
-                        <p className="mt-0.5 max-w-xs text-xs text-muted">{entry.description}</p>
+                        <span className="font-medium text-slate-900 dark:text-slate-100">{entry.objective}</span>
+                        <p className="mt-0.5 max-w-xs text-xs text-slate-500 dark:text-slate-400">{entry.description}</p>
                       </Td>
                       <Td className="text-sm">{entry.indicator ?? '—'}</Td>
                       <Td className="font-mono text-xs">{entry.formula ?? '—'}</Td>
-                      <Td className="max-w-40 text-xs text-muted">{entry.target ?? '—'}</Td>
+                      <Td className="max-w-40 text-xs text-slate-500 dark:text-slate-400">{entry.target ?? '—'}</Td>
                       <Td>
                         <Badge
                           variant={
@@ -186,7 +186,7 @@ export default function AuditoriaPage() {
                           {entry.modules.map((module) => (
                             <code
                               key={module}
-                              className="rounded bg-surface-muted px-1.5 py-0.5 text-[10px] text-muted"
+                              className="rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-500 dark:text-slate-400"
                             >
                               {module}
                             </code>
@@ -198,7 +198,7 @@ export default function AuditoriaPage() {
                 </Tbody>
               </Table>
 
-              <p className="text-xs text-muted">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Documento de trazabilidad: <code>{coverage.data.traceabilityDocument}</code> ·
                 generado el {dateTime(coverage.data.generatedAt)}.
               </p>
@@ -212,9 +212,9 @@ export default function AuditoriaPage() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-border px-3 py-2">
-      <p className="text-xs text-muted">{label}</p>
-      <p className="font-display text-sm font-semibold text-foreground">{value}</p>
+    <div className="rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2">
+      <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="font-[family-name:var(--font-poppins)] text-sm font-semibold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
   );
 }

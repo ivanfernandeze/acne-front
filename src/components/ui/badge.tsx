@@ -8,16 +8,16 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        neutral: 'bg-surface-muted text-foreground',
-        primary: 'bg-primary-soft text-primary',
-        success: 'bg-success-soft text-success',
-        warning: 'bg-warning-soft text-warning',
-        danger: 'bg-danger-soft text-danger',
-        outline: 'border border-border text-muted',
+        neutral: 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100',
+        primary: 'bg-sky-50 dark:bg-sky-950 text-sky-900 dark:text-sky-400',
+        success: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400',
+        warning: 'bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400',
+        danger: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400',
+        outline: 'border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400',
         // Experimental condition: colour-coded identically everywhere so the physician can never
         // mistake which condition a screen belongs to.
-        pretest: 'bg-surface-muted text-pretest ring-1 ring-inset ring-pretest/30',
-        postest: 'bg-primary-soft text-postest ring-1 ring-inset ring-postest/30',
+        pretest: 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 ring-1 ring-inset ring-slate-400/30 dark:ring-slate-500/30',
+        postest: 'bg-sky-50 dark:bg-sky-950 text-cyan-700 dark:text-cyan-400 ring-1 ring-inset ring-cyan-600/30 dark:ring-cyan-400/30',
       },
     },
     defaultVariants: { variant: 'neutral' },

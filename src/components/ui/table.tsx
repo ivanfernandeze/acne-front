@@ -21,7 +21,7 @@ export function Table({
     <div className="w-full overflow-x-auto">
       <table className={cn('w-full border-collapse text-sm', className)}>
         {caption !== undefined ? (
-          <caption className="px-1 pb-3 text-left text-xs text-muted">{caption}</caption>
+          <caption className="px-1 pb-3 text-left text-xs text-slate-500 dark:text-slate-400">{caption}</caption>
         ) : null}
         {children}
       </table>
@@ -30,15 +30,15 @@ export function Table({
 }
 
 export function Thead({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
-  return <thead className={cn('bg-surface-muted', className)} {...props} />;
+  return <thead className={cn('bg-slate-100 dark:bg-slate-800', className)} {...props} />;
 }
 
 export function Tbody({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
-  return <tbody className={cn('divide-y divide-border', className)} {...props} />;
+  return <tbody className={cn('divide-y divide-slate-200 dark:divide-slate-700', className)} {...props} />;
 }
 
 export function Tr({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) {
-  return <tr className={cn('transition-colors hover:bg-surface-muted/60', className)} {...props} />;
+  return <tr className={cn('transition-colors hover:bg-slate-100/60 dark:hover:bg-slate-800/60', className)} {...props} />;
 }
 
 export function Th({
@@ -50,7 +50,7 @@ export function Th({
     <th
       scope="col"
       className={cn(
-        'whitespace-nowrap border-b border-border px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-muted',
+        'whitespace-nowrap border-b border-slate-200 dark:border-slate-700 px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400',
         numeric === true && 'text-right',
         className,
       )}
@@ -67,7 +67,7 @@ export function Td({
   return (
     <td
       className={cn(
-        'px-3 py-2.5 align-top text-foreground',
+        'px-3 py-2.5 align-top text-slate-900 dark:text-slate-100',
         // Tabular figures keep columns of measurements aligned, which matters when the reader is
         // comparing 30 review times at a glance.
         numeric === true && 'text-right tabular-nums',

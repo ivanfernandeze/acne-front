@@ -14,19 +14,19 @@ import { cva, type VariantProps } from 'class-variance-authority';
  */
 export const buttonVariants = cva(
   'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium ' +
-    'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ' +
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-background ' +
+    'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-900 dark:focus-visible:ring-sky-400 ' +
+    'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:focus-visible:ring-offset-slate-950 ' +
     'disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        secondary: 'bg-surface-muted text-foreground hover:bg-border',
-        outline: 'border border-border bg-surface text-foreground hover:bg-surface-muted',
-        ghost: 'text-foreground hover:bg-surface-muted',
-        danger: 'bg-danger text-danger-foreground hover:bg-danger/90',
-        success: 'bg-success text-success-foreground hover:bg-success/90',
-        link: 'text-primary underline-offset-4 hover:underline',
+        primary: 'bg-sky-900 dark:bg-sky-600 text-white dark:text-slate-950 hover:bg-sky-800 dark:hover:bg-sky-500',
+        secondary: 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700',
+        outline: 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800',
+        ghost: 'text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800',
+        danger: 'bg-red-700 dark:bg-red-600 text-white dark:text-slate-950 hover:bg-red-800 dark:hover:bg-red-500',
+        success: 'bg-emerald-700 dark:bg-emerald-600 text-white dark:text-slate-950 hover:bg-emerald-800 dark:hover:bg-emerald-500',
+        link: 'text-sky-900 dark:text-sky-400 underline-offset-4 hover:underline',
       },
       size: {
         sm: 'h-8 px-3 text-xs',

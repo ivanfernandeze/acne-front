@@ -98,7 +98,7 @@ export function BoxPlot({
   const allValues = prepared.flatMap((s) => s.values);
   if (allValues.length === 0) {
     return (
-      <p className="py-10 text-center text-sm text-muted">
+      <p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">
         Todavía no hay mediciones suficientes para dibujar el diagrama de caja.
       </p>
     );
@@ -139,7 +139,7 @@ export function BoxPlot({
               x2={width - padding.right}
               y1={toY(tick)}
               y2={toY(tick)}
-              className="stroke-border"
+              className="stroke-slate-200 dark:stroke-slate-700"
               strokeWidth={1}
               strokeDasharray="3 3"
             />
@@ -148,7 +148,7 @@ export function BoxPlot({
               y={toY(tick)}
               textAnchor="end"
               dominantBaseline="middle"
-              className="fill-muted text-[10px] tabular-nums"
+              className="fill-slate-500 dark:fill-slate-400 text-[10px] tabular-nums"
             >
               {num(tick, 1)}
             </text>
@@ -165,14 +165,14 @@ export function BoxPlot({
                 x={centre}
                 y={padding.top + plotHeight / 2}
                 textAnchor="middle"
-                className="fill-muted text-[11px]"
+                className="fill-slate-500 dark:fill-slate-400 text-[11px]"
               >
                 sin datos
               </text>
             );
           }
 
-          const colour = entry.colorClass ?? 'text-primary';
+          const colour = entry.colorClass ?? 'text-sky-900 dark:text-sky-400';
           const boxTop = toY(stats.q3);
           const boxBottom = toY(stats.q1);
 
@@ -252,7 +252,7 @@ export function BoxPlot({
                 x={centre}
                 y={height - padding.bottom + 18}
                 textAnchor="middle"
-                className="fill-foreground text-[11px] font-medium"
+                className="fill-slate-900 dark:fill-slate-100 text-[11px] font-medium"
               >
                 {entry.label}
               </text>
@@ -260,7 +260,7 @@ export function BoxPlot({
                 x={centre}
                 y={height - padding.bottom + 32}
                 textAnchor="middle"
-                className="fill-muted text-[10px] tabular-nums"
+                className="fill-slate-500 dark:fill-slate-400 text-[10px] tabular-nums"
               >
                 n = {stats.n} · med. {num(stats.median, 2)}
               </text>
@@ -273,14 +273,14 @@ export function BoxPlot({
             x={padding.left - 8}
             y={padding.top - 4}
             textAnchor="end"
-            className="fill-muted text-[10px]"
+            className="fill-slate-500 dark:fill-slate-400 text-[10px]"
           >
             {unit}
           </text>
         ) : null}
       </svg>
 
-      <p className="px-1 pt-1 text-xs text-muted">
+      <p className="px-1 pt-1 text-xs text-slate-500 dark:text-slate-400">
         Caja: Q1–Q3 · línea gruesa: mediana · bigotes: 1,5 × RIC (Tukey) · círculos: valores atípicos.
       </p>
     </div>

@@ -100,15 +100,15 @@ export default function CasoDetallePage() {
         <div>
           <Link
             href="/portal/casos"
-            className="flex items-center gap-1 text-sm text-muted hover:text-foreground"
+            className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
             Volver a la bandeja
           </Link>
-          <h1 className="mt-1 font-display text-xl font-bold text-foreground">
+          <h1 className="mt-1 font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">
             {detail.caseCode}
           </h1>
-          <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">
+          <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
             <span className="font-mono text-xs">{detail.patientCode}</span>
             <span aria-hidden>·</span>
             <Badge variant="neutral">
@@ -145,7 +145,7 @@ export default function CasoDetallePage() {
             />
             <CardBody>
               {displayed === undefined ? (
-                <div className="flex flex-col items-center gap-2 py-12 text-muted">
+                <div className="flex flex-col items-center gap-2 py-12 text-slate-500 dark:text-slate-400">
                   <ImageOff className="h-8 w-8" aria-hidden />
                   <p className="text-sm">Este caso todavía no tiene imágenes.</p>
                 </div>
@@ -156,7 +156,7 @@ export default function CasoDetallePage() {
                   <img
                     src={api.url(displayed.url.replace(/^\/api/, ''))}
                     alt={`Imagen clínica del caso ${detail.caseCode}`}
-                    className="w-full rounded-md border border-border bg-surface-muted object-contain"
+                    className="w-full rounded-md border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 object-contain"
                   />
                   {clinicalImages.length > 1 ? (
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -170,8 +170,8 @@ export default function CasoDetallePage() {
                           }}
                           className={
                             image.id === selectedImage
-                              ? 'rounded-md border-2 border-primary px-3 py-1 text-xs font-medium text-primary'
-                              : 'rounded-md border border-border px-3 py-1 text-xs text-muted hover:border-primary'
+                              ? 'rounded-md border-2 border-sky-900 dark:border-sky-400 px-3 py-1 text-xs font-medium text-sky-900 dark:text-sky-400'
+                              : 'rounded-md border border-slate-200 dark:border-slate-700 px-3 py-1 text-xs text-slate-500 dark:text-slate-400 hover:border-sky-900 dark:hover:border-sky-400'
                           }
                         >
                           Imagen {index + 1}
@@ -191,7 +191,7 @@ export default function CasoDetallePage() {
                 <StudyModeBlocked />
               ) : detail.inference === null ? (
                 <div className="space-y-3">
-                  <p className="text-sm text-muted">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Este caso aún no tiene una inferencia. Encólela para obtener la clase IGA
                     sugerida y el mapa Grad-CAM.
                   </p>
@@ -230,20 +230,20 @@ export default function CasoDetallePage() {
                 <div className="space-y-4">
                   <div className="flex flex-wrap items-end gap-4">
                     <div>
-                      <p className="text-xs text-muted">Clase IGA sugerida</p>
-                      <p className="font-display text-2xl font-bold text-postest">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Clase IGA sugerida</p>
+                      <p className="font-[family-name:var(--font-poppins)] text-2xl font-bold text-cyan-700 dark:text-cyan-400">
                         {igaLabel(catalogs, detail.inference.igaClass)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted">Confianza</p>
-                      <p className="font-display text-xl font-semibold tabular-nums text-foreground">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Confianza</p>
+                      <p className="font-[family-name:var(--font-poppins)] text-xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">
                         {detail.inference.confidence === null
                           ? '—'
                           : pct(detail.inference.confidence * 100)}
                       </p>
                     </div>
-                    <div className="ml-auto text-right text-xs text-muted">
+                    <div className="ml-auto text-right text-xs text-slate-500 dark:text-slate-400">
                       <p>GAGS: {detail.inference.gagsScore ?? '—'}</p>
                       <p>{detail.inference.latencyMs ?? '—'} ms</p>
                     </div>
@@ -255,16 +255,16 @@ export default function CasoDetallePage() {
                         .sort(([, a], [, b]) => b - a)
                         .map(([igaClass, probability]) => (
                           <div key={igaClass} className="flex items-center gap-2 text-xs">
-                            <span className="w-36 shrink-0 text-muted">
+                            <span className="w-36 shrink-0 text-slate-500 dark:text-slate-400">
                               {igaLabel(catalogs, igaClass)}
                             </span>
-                            <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-muted">
+                            <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                               <div
-                                className="h-full rounded-full bg-postest"
+                                className="h-full rounded-full bg-cyan-700 dark:bg-cyan-500"
                                 style={{ width: `${Math.round(probability * 100)}%` }}
                               />
                             </div>
-                            <span className="w-12 text-right tabular-nums text-foreground">
+                            <span className="w-12 text-right tabular-nums text-slate-900 dark:text-slate-100">
                               {num(probability * 100, 1)}%
                             </span>
                           </div>
@@ -288,20 +288,20 @@ export default function CasoDetallePage() {
 
         <div className="space-y-5">
           {alreadyDiagnosed ? (
-            <Card className="border-success/50">
+            <Card className="border-emerald-600/50 dark:border-emerald-400/50">
               <CardBody className="space-y-3">
-                <p className="flex items-center gap-2 font-display text-sm font-semibold text-success">
+                <p className="flex items-center gap-2 font-[family-name:var(--font-poppins)] text-sm font-semibold text-emerald-700 dark:text-emerald-400">
                   <CheckCircle2 className="h-5 w-5" aria-hidden />
                   Caso ya diagnosticado en esta condición
                 </p>
-                <p className="text-sm text-muted">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   Cada caso aporta una única medición por condición experimental. Para la otra
                   observación, cambie su modo de estudio.
                 </p>
                 {detail.timing?.durationMinutes != null ? (
-                  <p className="text-sm text-muted">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Tiempo de revisión registrado:{' '}
-                    <strong className="text-foreground">
+                    <strong className="text-slate-900 dark:text-slate-100">
                       {num(detail.timing.durationMinutes)} min
                     </strong>
                   </p>
@@ -332,30 +332,30 @@ export default function CasoDetallePage() {
             <CardHeader title="Mediciones registradas" />
             <CardBody className="space-y-2 text-sm">
               {diagnoses.length === 0 ? (
-                <p className="text-muted">Sin diagnósticos todavía.</p>
+                <p className="text-slate-500 dark:text-slate-400">Sin diagnósticos todavía.</p>
               ) : (
                 diagnoses.map((diagnosis) => (
                   <div
                     key={diagnosis.id}
-                    className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
+                    className="flex items-center justify-between gap-2 rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2"
                   >
                     <StudyModeBadge mode={diagnosis.studyMode} />
-                    <span className="text-foreground">
+                    <span className="text-slate-900 dark:text-slate-100">
                       {igaLabel(catalogs, diagnosis.igaClass)}
                     </span>
                   </div>
                 ))
               )}
               {detail.groundTruthIga !== null ? (
-                <p className="pt-2 text-xs text-muted">
+                <p className="pt-2 text-xs text-slate-500 dark:text-slate-400">
                   Patrón de consenso del lote:{' '}
-                  <strong className="text-foreground">
+                  <strong className="text-slate-900 dark:text-slate-100">
                     {igaLabel(catalogs, detail.groundTruthIga)}
                   </strong>{' '}
                   — es lo que hace comparables pretest y postest (RF-OE2-05).
                 </p>
               ) : (
-                <p className="pt-2 text-xs text-warning">
+                <p className="pt-2 text-xs text-amber-600 dark:text-amber-400">
                   Este caso no tiene patrón de consenso, por lo que no aporta al cálculo de TPD.
                 </p>
               )}

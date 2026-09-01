@@ -5,9 +5,9 @@ import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type Selec
 import { cn } from '@/lib/cn';
 
 const CONTROL_CLASSES =
-  'w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground ' +
-  'placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 ' +
-  'focus:ring-primary/25 disabled:cursor-not-allowed disabled:opacity-60';
+  'w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 ' +
+  'placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:border-sky-900 dark:focus:border-sky-400 focus:outline-none focus:ring-2 ' +
+  'focus:ring-sky-900/25 dark:focus:ring-sky-400/25 disabled:cursor-not-allowed disabled:opacity-60';
 
 export function Field({
   label,
@@ -28,15 +28,15 @@ export function Field({
 }) {
   return (
     <div className={cn('space-y-1.5', className)}>
-      <label htmlFor={htmlFor} className="block text-sm font-medium text-foreground">
+      <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-900 dark:text-slate-100">
         {label}
-        {required === true ? <span className="ml-0.5 text-danger">*</span> : null}
+        {required === true ? <span className="ml-0.5 text-red-700 dark:text-red-400">*</span> : null}
       </label>
       {children}
       {error != null && error !== '' ? (
-        <p className="text-xs text-danger">{error}</p>
+        <p className="text-xs text-red-700 dark:text-red-400">{error}</p>
       ) : hint !== undefined ? (
-        <p className="text-xs text-muted">{hint}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{hint}</p>
       ) : null}
     </div>
   );

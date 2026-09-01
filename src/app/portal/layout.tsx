@@ -52,12 +52,12 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
   if (user === null) return null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-20 border-b border-border bg-surface/95 backdrop-blur">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <header className="sticky top-0 z-20 border-b border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3">
           <Link href="/portal" className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-primary" aria-hidden />
-            <span className="font-display text-sm font-semibold text-foreground">
+            <Activity className="h-5 w-5 text-sky-900 dark:text-sky-400" aria-hidden />
+            <span className="font-[family-name:var(--font-poppins)] text-sm font-semibold text-slate-900 dark:text-slate-100">
               Portal del dermatólogo
             </span>
           </Link>
@@ -65,14 +65,14 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
           <div className="ml-auto flex items-center gap-3">
             <StudyModeSwitch />
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-medium text-foreground">{user.fullName}</p>
-              <p className="text-xs text-muted">{user.email}</p>
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{user.fullName}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
             </div>
             <button
               type="button"
               onClick={logout}
               title="Cerrar sesión"
-              className="rounded-md p-2 text-muted transition-colors hover:bg-surface-muted hover:text-foreground"
+              className="rounded-md p-2 text-slate-500 dark:text-slate-400 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
             >
               <LogOut className="h-4 w-4" aria-hidden />
               <span className="sr-only">Cerrar sesión</span>
@@ -93,8 +93,8 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
                     className={cn(
                       'flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-sm transition-colors',
                       active
-                        ? 'bg-primary-soft font-medium text-primary'
-                        : 'text-muted hover:bg-surface-muted hover:text-foreground',
+                        ? 'bg-sky-50 dark:bg-sky-950 font-medium text-sky-900 dark:text-sky-400'
+                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100',
                     )}
                   >
                     <Icon className="h-4 w-4" aria-hidden />

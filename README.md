@@ -3,7 +3,7 @@
 Portal del dermatólogo y PWA del paciente del prototipo de diagnóstico asistido de acné con
 inteligencia artificial — **Tesis UNT 2026**.
 
-Next.js 14 (App Router) · TypeScript estricto · Tailwind CSS · Recharts
+Next.js 14 (App Router) · TypeScript estricto · Tailwind CSS v4 · Recharts
 
 ---
 
@@ -47,24 +47,39 @@ Entre en <http://localhost:3000/login> con una de las cuentas que imprimió
 
 ### 1. Tailwind-only, verificado por CI
 
-La Sección 12.3 lo plantea como regla dura, y aquí se **comprueba**, no se confía:
+Regla dura, **más estricta que la Sección 12.3** del documento maestro: aquel admite las tres
+directivas `@tailwind` más las variables del tema en `:root`/`.dark`; en este proyecto
+`globals.css` no lleva nada de eso.
 
-- Los estilos son clases de utilidad Tailwind escritas en el JSX.
-- `src/app/globals.css` contiene **solo** las tres directivas `@tailwind` y las variables del tema
-  en `:root` y `.dark`. Nada más.
-- Prohibido cualquier otro `.css`/`.scss`/`.module.css`, y prohibidos `@apply`, `@layer
-  components` con clases propias, `@import` y `@font-face`.
+```css
+/* src/app/globals.css — el archivo completo */
+@import "tailwindcss";
+```
+
+- **No hay tema propio ni variables CSS.** Los componentes usan la paleta que trae Tailwind
+  (`bg-white`, `text-slate-900`, `bg-sky-900`, `dark:bg-slate-900`…). No existe
+  `tailwind.config.ts`: Tailwind v4 detecta el contenido por su cuenta.
+- **No hay ningún otro archivo de estilos.** Prohibidos `.css`/`.scss`/`.module.css` adicionales,
+  `@apply`, `@layer components`, `@theme`, `@font-face` y cualquier selector.
 - Los patrones repetidos se abstraen como componentes React (`<Button variant="primary">`,
   `<Card>`), nunca como clases CSS, usando `class-variance-authority`.
 - Composición con `cn()` = `clsx` + `tailwind-merge`. Iconos de `lucide-react`. Fuentes Inter y
-  Poppins vía `next/font` (self-hosted, sin llamadas a Google desde una pantalla de paciente).
+  Poppins vía `next/font`, aplicadas como valor arbitrario —
+  `font-[family-name:var(--font-poppins)]` — para no necesitar configuración.
+- **Color de la condición experimental:** `slate` para pretest (sin IA) y `cyan` para postest (con
+  IA), de forma consistente en todo el portal. El profesional nunca debe dudar de bajo qué
+  condición está registrando.
 
 ```bash
 pnpm lint:css
 ```
 
-`scripts/check-no-custom-css.mjs` recorre `src/` y `public/` y falla con un mensaje concreto ante
-cualquier violación. Está conectado al CI.
+`scripts/check-no-custom-css.mjs` exige que `globals.css` contenga **exactamente** esa línea y
+nada más, y que no exista ningún otro CSS. Falla con un mensaje concreto y está conectado al CI.
+
+> **Modo oscuro:** al no haber configuración, `dark:` responde a la preferencia del sistema
+> operativo (`prefers-color-scheme`), no a una clase. Un conmutador manual exigiría un
+> `@custom-variant` en el CSS, que esta política no permite.
 
 ### 2. Cero tipos escritos a mano
 

@@ -26,36 +26,36 @@ export function ConfusionMatrix({
   return (
     <div className={cn('w-full overflow-x-auto', className)}>
       <table className="w-full border-collapse text-sm">
-        <caption className="px-1 pb-3 text-left text-xs text-muted">
+        <caption className="px-1 pb-3 text-left text-xs text-slate-500 dark:text-slate-400">
           Filas: diagnóstico de referencia · Columnas: predicción · Diagonal: concordancia.
         </caption>
         <thead>
           <tr>
-            <th className="border-b border-border px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted">
+            <th className="border-b border-slate-200 dark:border-slate-700 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
               Referencia \ Predicción
             </th>
             {labels.map((label) => (
               <th
                 key={label}
                 scope="col"
-                className="border-b border-border px-3 py-2 text-center text-xs font-semibold text-muted"
+                className="border-b border-slate-200 dark:border-slate-700 px-3 py-2 text-center text-xs font-semibold text-slate-500 dark:text-slate-400"
               >
                 {label}
               </th>
             ))}
-            <th className="border-b border-border px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-muted">
+            <th className="border-b border-slate-200 dark:border-slate-700 px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
               Total
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border">
+        <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
           {matrix.map((row, rowIndex) => {
             const total = rowTotals[rowIndex] ?? 0;
             return (
               <tr key={labels[rowIndex] ?? rowIndex}>
                 <th
                   scope="row"
-                  className="whitespace-nowrap px-3 py-2 text-left text-xs font-medium text-foreground"
+                  className="whitespace-nowrap px-3 py-2 text-left text-xs font-medium text-slate-900 dark:text-slate-100"
                 >
                   {labels[rowIndex] ?? `Clase ${rowIndex}`}
                 </th>
@@ -67,15 +67,16 @@ export function ConfusionMatrix({
                       key={`${rowIndex}-${columnIndex}`}
                       className={cn(
                         'px-3 py-2 text-center tabular-nums',
-                        isDiagonal ? 'font-semibold text-success' : 'text-foreground',
+                        isDiagonal ? 'font-semibold text-emerald-700 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100',
                       )}
                       style={{
-                        // Inline opacity is a per-cell datum, not a style rule: it encodes the
-                        // value itself, so it cannot live in a utility class.
+                        // The shade encodes the cell's own value, so it is a datum rather than a
+                        // style rule and cannot be expressed as a utility class. Colours are
+                        // Tailwind's emerald-600 and red-600 with a data-driven alpha.
                         backgroundColor:
                           value === 0
                             ? undefined
-                            : `hsl(var(--${isDiagonal ? 'success' : 'danger'}) / ${0.08 + share * 0.32})`,
+                            : `rgb(${isDiagonal ? '0 150 137' : '231 0 11'} / ${0.08 + share * 0.32})`,
                       }}
                       title={`${value} caso(s) · ${(share * 100).toFixed(1)} % de la fila`}
                     >
@@ -83,7 +84,7 @@ export function ConfusionMatrix({
                     </td>
                   );
                 })}
-                <td className="px-3 py-2 text-right tabular-nums text-muted">{total}</td>
+                <td className="px-3 py-2 text-right tabular-nums text-slate-500 dark:text-slate-400">{total}</td>
               </tr>
             );
           })}

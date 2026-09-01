@@ -81,13 +81,13 @@ export default function NuevoCasoPage() {
     <div className="mx-auto max-w-2xl space-y-5">
       <Link
         href="/portal/casos"
-        className="flex items-center gap-1 text-sm text-muted hover:text-foreground"
+        className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Volver a la bandeja
       </Link>
 
-      <h1 className="font-display text-xl font-bold text-foreground">Nuevo caso clínico</h1>
+      <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">Nuevo caso clínico</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <Card>
@@ -162,16 +162,16 @@ export default function NuevoCasoPage() {
                   </Field>
                 </div>
 
-                <label className="flex items-start gap-2 rounded-md border border-border bg-surface-muted px-3 py-3 text-sm">
+                <label className="flex items-start gap-2 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 px-3 py-3 text-sm">
                   <input
                     type="checkbox"
                     checked={consent}
                     onChange={(event) => setConsent(event.target.checked)}
                     required
-                    className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                    className="mt-0.5 h-4 w-4 rounded border-slate-200 dark:border-slate-700 text-sky-900 dark:text-sky-400 focus:ring-sky-900 dark:focus:ring-sky-400"
                   />
                   <span>
-                    <strong className="text-foreground">Consentimiento informado</strong> — el
+                    <strong className="text-slate-900 dark:text-slate-100">Consentimiento informado</strong> — el
                     paciente ha sido informado del propósito académico del estudio, del tratamiento
                     de su imagen facial y de su derecho a retirarse en cualquier momento
                     (Ley N.º 29733, RNF-07).
@@ -208,7 +208,7 @@ export default function NuevoCasoPage() {
                   <Upload className="h-4 w-4" aria-hidden />
                   Seleccionar imagen
                 </Button>
-                <span className="truncate text-sm text-muted">
+                <span className="truncate text-sm text-slate-500 dark:text-slate-400">
                   {file?.name ?? 'Ningún archivo seleccionado'}
                 </span>
               </div>

@@ -53,10 +53,10 @@ export default function AnexosPage() {
     <div className="space-y-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-xl font-bold text-foreground">
+          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">
             Instrumentos digitalizados
           </h1>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Las fichas de registro de los Anexos 4, 5 y 7, con los mismos campos del instrumento en
             papel.
           </p>
@@ -85,8 +85,8 @@ export default function AnexosPage() {
             className={cn(
               'rounded-md border px-3 py-2 text-sm transition-colors',
               tab === item.key
-                ? 'border-primary bg-primary-soft font-medium text-primary'
-                : 'border-border text-muted hover:bg-surface-muted',
+                ? 'border-sky-900 dark:border-sky-400 bg-sky-50 dark:bg-sky-950 font-medium text-sky-900 dark:text-sky-400'
+                : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
             )}
           >
             {item.label}
@@ -111,12 +111,12 @@ export default function AnexosPage() {
                 <option value="pretest">Pretest</option>
                 <option value="postest">Postest</option>
               </Select>
-              <label className="flex items-center gap-2 text-xs text-muted">
+              <label className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                 <input
                   type="checkbox"
                   checked={includeSynthetic}
                   onChange={(event) => setIncludeSynthetic(event.target.checked)}
-                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                  className="h-4 w-4 rounded border-slate-200 dark:border-slate-700 text-sky-900 dark:text-sky-400 focus:ring-sky-900 dark:focus:ring-sky-400"
                 />
                 Sintéticos
               </label>
@@ -153,12 +153,12 @@ export default function AnexosPage() {
                     <Td numeric>{row.number}</Td>
                     <Td>{date(row.date)}</Td>
                     <Td className="font-mono text-xs">{row.caseCode}</Td>
-                    <Td className="font-mono text-xs text-muted">{row.patientCode}</Td>
+                    <Td className="font-mono text-xs text-slate-500 dark:text-slate-400">{row.patientCode}</Td>
                     <Td className="text-sm">{row.professional}</Td>
                     <Td>
                       <StudyModeBadge mode={row.studyMode} />
                     </Td>
-                    <Td className="text-sm text-muted">
+                    <Td className="text-sm text-slate-500 dark:text-slate-400">
                       {new Date(row.startTime).toLocaleTimeString('es-PE', {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -216,7 +216,7 @@ export default function AnexosPage() {
                         <Badge variant="danger">Incorrecto</Badge>
                       )}
                     </Td>
-                    <Td className="text-xs text-muted">{row.standard}</Td>
+                    <Td className="text-xs text-slate-500 dark:text-slate-400">{row.standard}</Td>
                   </Tr>
                 ))}
               </Tbody>

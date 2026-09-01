@@ -29,16 +29,16 @@ export function IndicatorCard({ data }: { data: IndicatorComparison }) {
   const ArrowIcon = change === null ? Minus : change < 0 ? ArrowDownRight : ArrowUpRight;
 
   return (
-    <Card className={cn(data.targetMet === false && 'border-warning/50')}>
+    <Card className={cn(data.targetMet === false && 'border-amber-500/50 dark:border-amber-400/50')}>
       <CardBody className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted">
+            <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
               {definition.objective}
               <span aria-hidden>·</span>
               {data.indicator}
             </p>
-            <h3 className="mt-0.5 truncate font-display text-sm font-semibold text-foreground">
+            <h3 className="mt-0.5 truncate font-[family-name:var(--font-poppins)] text-sm font-semibold text-slate-900 dark:text-slate-100">
               {definition.name}
             </h3>
           </div>
@@ -53,27 +53,27 @@ export function IndicatorCard({ data }: { data: IndicatorComparison }) {
 
         <div className="flex items-end gap-4">
           <div>
-            <p className="text-xs text-muted">Pretest</p>
-            <p className="font-display text-xl font-semibold tabular-nums text-pretest">
+            <p className="text-xs text-slate-500 dark:text-slate-400">Pretest</p>
+            <p className="font-[family-name:var(--font-poppins)] text-xl font-semibold tabular-nums text-slate-500 dark:text-slate-400">
               {data.pretest === null ? '—' : num(data.pretest.value)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted">Postest</p>
-            <p className="font-display text-2xl font-bold tabular-nums text-postest">
+            <p className="text-xs text-slate-500 dark:text-slate-400">Postest</p>
+            <p className="font-[family-name:var(--font-poppins)] text-2xl font-bold tabular-nums text-cyan-700 dark:text-cyan-400">
               {data.postest === null ? '—' : num(data.postest.value)}
             </p>
           </div>
           <div className="ml-auto text-right">
-            <p className="text-xs text-muted">{definition.unit}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{definition.unit}</p>
             <p
               className={cn(
                 'flex items-center justify-end gap-0.5 text-sm font-semibold tabular-nums',
                 improved === null
-                  ? 'text-muted'
+                  ? 'text-slate-500 dark:text-slate-400'
                   : improved
-                    ? 'text-success'
-                    : 'text-danger',
+                    ? 'text-emerald-700 dark:text-emerald-400'
+                    : 'text-red-700 dark:text-red-400',
               )}
             >
               <ArrowIcon className="h-3.5 w-3.5" aria-hidden />
@@ -82,12 +82,12 @@ export function IndicatorCard({ data }: { data: IndicatorComparison }) {
           </div>
         </div>
 
-        <p className="text-xs text-muted">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           <span className="font-mono">{definition.formula}</span> · Meta: {definition.target}
         </p>
 
         {data.alert !== null ? (
-          <p className="rounded-md border border-warning/40 bg-warning-soft px-3 py-2 text-xs text-foreground">
+          <p className="rounded-md border border-amber-500/40 dark:border-amber-400/40 bg-amber-50 dark:bg-amber-950 px-3 py-2 text-xs text-slate-900 dark:text-slate-100">
             {data.alert}
           </p>
         ) : null}

@@ -25,9 +25,20 @@ export interface ComparisonDatum {
   condition: 'pretest' | 'postest';
 }
 
+/**
+ * Recharts needs concrete colour strings, not utility classes, so the palette is restated here as
+ * literals taken from Tailwind's own scale. They must stay in step with the classes the rest of
+ * the portal uses for each condition: slate-500 for pretest (sin IA), cyan-700 for postest (con IA).
+ */
+const SLATE_500 = '#62748e';
+const SLATE_200 = '#e2e8f0';
+const CYAN_700 = '#0e7490';
+const SLATE_900 = '#0f172b';
+const SLATE_100 = '#f1f5f9';
+
 const COLORS: Record<ComparisonDatum['condition'], string> = {
-  pretest: 'hsl(var(--pretest))',
-  postest: 'hsl(var(--postest))',
+  pretest: SLATE_500,
+  postest: CYAN_700,
 };
 
 export function ComparisonBar({
@@ -40,34 +51,34 @@ export function ComparisonBar({
   height?: number;
 }) {
   if (data.length === 0) {
-    return <p className="py-10 text-center text-sm text-muted">Sin datos para comparar.</p>;
+    return <p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">Sin datos para comparar.</p>;
   }
 
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={SLATE_200} vertical={false} />
         <XAxis
           dataKey="label"
-          tick={{ fill: 'hsl(var(--muted))', fontSize: 12 }}
-          axisLine={{ stroke: 'hsl(var(--border))' }}
+          tick={{ fill: SLATE_500, fontSize: 12 }}
+          axisLine={{ stroke: SLATE_200 }}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: 'hsl(var(--muted))', fontSize: 11 }}
+          tick={{ fill: SLATE_500, fontSize: 11 }}
           axisLine={false}
           tickLine={false}
           width={56}
         />
         <Tooltip
-          cursor={{ fill: 'hsl(var(--surface-muted))' }}
+          cursor={{ fill: SLATE_100 }}
           contentStyle={{
-            backgroundColor: 'hsl(var(--surface))',
-            border: '1px solid hsl(var(--border))',
+            backgroundColor: '#ffffff',
+            border: `1px solid ${SLATE_200}`,
             borderRadius: 8,
             fontSize: 12,
           }}
-          labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600 }}
+          labelStyle={{ color: SLATE_900, fontWeight: 600 }}
           formatter={(value: number) => [`${num(value, 2)} ${unit}`, 'Valor']}
         />
         <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={96}>

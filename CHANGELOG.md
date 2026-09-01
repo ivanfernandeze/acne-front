@@ -16,9 +16,9 @@ versionado con [SemVer](https://semver.org/lang/es/).
   la API.
 - **Cliente tipado desde OpenAPI**: `pnpm generate:api-types` genera `src/types/api-schema.d.ts`
   desde el documento de `acne-api`. Ningún tipo de respuesta se escribe a mano.
-- **Política Tailwind-only verificada**: `scripts/check-no-custom-css.mjs` (`pnpm lint:css`) falla
-  si aparece cualquier `.css` fuera de `globals.css`, o si `globals.css` contiene algo distinto de
-  las tres directivas `@tailwind` y las variables de tema en `:root`/`.dark`. Conectado al CI.
+- **Política Tailwind-only verificada**: `scripts/check-no-custom-css.mjs` (`pnpm lint:css`) exige
+  que `src/app/globals.css` contenga exactamente `@import "tailwindcss";` y nada más, y que no
+  exista ningún otro archivo de estilos. Conectado al CI.
 - **Componentes propios** al estilo shadcn/ui con `class-variance-authority`, `clsx` y
   `tailwind-merge`; iconos de `lucide-react`; fuentes Inter/Poppins vía `next/font`.
 - **Boxplot en SVG** escrito a mano (Recharts no tiene uno nativo) con convención de Tukey.
@@ -30,6 +30,18 @@ versionado con [SemVer](https://semver.org/lang/es/).
   decimal. La tesis y los reportes PDF usan la coma, de modo que el tablero mostraba «8.78» donde
   el reporte imprimía «8,78» — una invitación a errores de transcripción en el capítulo de
   resultados. El locale se fija ahora a la convención del documento, no a la del país.
+
+### Changed
+
+- **Migración a Tailwind CSS v4 sin tema propio.** `globals.css` se reduce a
+  `@import "tailwindcss";`, se elimina `tailwind.config.ts` y se retiran `autoprefixer` y
+  `tailwindcss-animate`. Los 31 archivos de interfaz pasan de tokens semánticos
+  (`bg-surface`, `text-muted`, `bg-primary`, `text-pretest`…) a la paleta de fábrica de Tailwind,
+  conservando el modo oscuro en cada clase (`bg-white dark:bg-slate-900`). Es una desviación
+  **más estricta** que la Sección 12.3 del documento maestro, que sí admitía variables de tema en
+  `:root`/`.dark`.
+- Los colores de Recharts y de la matriz de confusión, que necesitan cadenas y no clases, pasan de
+  `hsl(var(--token))` a literales de la escala de Tailwind declarados junto al componente.
 
 ### Notes
 

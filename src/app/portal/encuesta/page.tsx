@@ -59,10 +59,10 @@ export default function EncuestaPage() {
     <div className="space-y-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-xl font-bold text-foreground">
+          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">
             Cuestionario de satisfacción
           </h1>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Anexo 6 · 8 ítems Likert · TSP = (Σ PO / PT) × 100, con PT = 40 puntos por encuestado.
           </p>
         </div>
@@ -101,7 +101,7 @@ export default function EncuestaPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {items.map((item) => (
                 <fieldset key={item.number} className="space-y-2">
-                  <legend className="text-sm font-medium text-foreground">
+                  <legend className="text-sm font-medium text-slate-900 dark:text-slate-100">
                     {item.number}. {item.text}
                   </legend>
                   <div className="flex flex-wrap gap-2">
@@ -118,8 +118,8 @@ export default function EncuestaPage() {
                           className={cn(
                             'flex min-w-24 flex-col items-center rounded-md border px-3 py-2 text-xs transition-colors',
                             selected
-                              ? 'border-primary bg-primary-soft font-medium text-primary'
-                              : 'border-border text-muted hover:border-primary/50 hover:bg-surface-muted',
+                              ? 'border-sky-900 dark:border-sky-400 bg-sky-50 dark:bg-sky-950 font-medium text-sky-900 dark:text-sky-400'
+                              : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-sky-900/50 dark:hover:border-sky-400/50 hover:bg-slate-100 dark:hover:bg-slate-800',
                           )}
                         >
                           <span className="text-base font-semibold">{score}</span>
@@ -132,7 +132,7 @@ export default function EncuestaPage() {
               ))}
 
               <label className="block space-y-1.5">
-                <span className="text-sm font-medium text-foreground">
+                <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
                   Comentarios (opcional)
                 </span>
                 <Textarea
@@ -153,7 +153,7 @@ export default function EncuestaPage() {
                 Enviar cuestionario
               </Button>
               {!complete ? (
-                <p className="text-center text-xs text-muted">
+                <p className="text-center text-xs text-slate-500 dark:text-slate-400">
                   Responda los {items.length} ítems para poder enviar.
                 </p>
               ) : null}
@@ -180,7 +180,7 @@ export default function EncuestaPage() {
           {summary.loading ? (
             <Loading />
           ) : summary.data === null || summary.data.respondents === 0 ? (
-            <p className="py-6 text-center text-sm text-muted">Aún no hay respuestas.</p>
+            <p className="py-6 text-center text-sm text-slate-500 dark:text-slate-400">Aún no hay respuestas.</p>
           ) : (
             <>
               <div className="grid gap-3 sm:grid-cols-3">
@@ -195,18 +195,18 @@ export default function EncuestaPage() {
 
               <div className="space-y-3">
                 {summary.data.items.map((item) => (
-                  <div key={item.itemNumber} className="rounded-md border border-border px-3 py-2">
-                    <p className="text-sm text-foreground">
+                  <div key={item.itemNumber} className="rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2">
+                    <p className="text-sm text-slate-900 dark:text-slate-100">
                       <span className="font-medium">{item.itemNumber}.</span> {item.text}
                     </p>
                     <div className="mt-2 flex items-center gap-3">
-                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-muted">
+                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                         <div
-                          className="h-full rounded-full bg-primary"
+                          className="h-full rounded-full bg-sky-900 dark:bg-sky-600"
                           style={{ width: `${Math.round(item.tspPct)}%` }}
                         />
                       </div>
-                      <span className="w-32 shrink-0 text-right text-xs tabular-nums text-muted">
+                      <span className="w-32 shrink-0 text-right text-xs tabular-nums text-slate-500 dark:text-slate-400">
                         {num(item.mean)} ± {num(item.sd)} · {pct(item.tspPct)}
                       </span>
                     </div>
@@ -223,9 +223,9 @@ export default function EncuestaPage() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-border px-3 py-2">
-      <p className="text-xs text-muted">{label}</p>
-      <p className="font-display text-lg font-semibold tabular-nums text-foreground">{value}</p>
+    <div className="rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2">
+      <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="font-[family-name:var(--font-poppins)] text-lg font-semibold tabular-nums text-slate-900 dark:text-slate-100">{value}</p>
     </div>
   );
 }

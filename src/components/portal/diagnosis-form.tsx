@@ -81,13 +81,13 @@ export function DiagnosisForm({
                     className={cn(
                       'flex items-center justify-between rounded-md border px-3 py-2 text-left text-sm transition-colors',
                       selected
-                        ? 'border-primary bg-primary-soft font-medium text-primary'
-                        : 'border-border text-foreground hover:border-primary/50 hover:bg-surface-muted',
+                        ? 'border-sky-900 dark:border-sky-400 bg-sky-50 dark:bg-sky-950 font-medium text-sky-900 dark:text-sky-400'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 hover:border-sky-900/50 dark:hover:border-sky-400/50 hover:bg-slate-100 dark:hover:bg-slate-800',
                     )}
                   >
                     <span>{catalogs?.iga.labels[value] ?? value}</span>
                     {isAiSuggestion ? (
-                      <span className="ml-2 rounded-full bg-postest/15 px-2 py-0.5 text-[10px] font-medium text-postest">
+                      <span className="ml-2 rounded-full bg-cyan-700/15 dark:bg-cyan-400/15 px-2 py-0.5 text-[10px] font-medium text-cyan-700 dark:text-cyan-400">
                         sugerida por IA
                       </span>
                     ) : null}
@@ -130,7 +130,7 @@ export function DiagnosisForm({
             Emitir diagnóstico definitivo
           </Button>
 
-          <p className="text-xs text-muted">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Al enviar se cierra el cronómetro de la revisión y la medición queda registrada como
             evidencia del estudio.
           </p>

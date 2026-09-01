@@ -68,16 +68,16 @@ export function StudyModeSwitch() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-900 dark:focus-visible:ring-sky-400"
         title="Cambiar el modo de estudio"
       >
         <StudyModeBadge mode={user.studyMode} />
       </button>
 
       {open ? (
-        <div className="absolute right-0 z-30 mt-2 w-80 animate-fade-in rounded-lg border border-border bg-surface p-4 shadow-lg">
-          <p className="font-display text-sm font-semibold text-foreground">Modo de estudio</p>
-          <p className="mt-1 text-xs text-muted">
+        <div className="absolute right-0 z-30 mt-2 w-80 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 shadow-lg">
+          <p className="font-[family-name:var(--font-poppins)] text-sm font-semibold text-slate-900 dark:text-slate-100">Modo de estudio</p>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Determina la condición experimental bajo la que se registran sus mediciones. Pasar de
             pretest a postest equivale a aplicar la intervención X del diseño y queda registrado en
             la auditoría.
@@ -90,11 +90,11 @@ export function StudyModeSwitch() {
                 type="button"
                 disabled={pending || mode === user.studyMode}
                 onClick={() => void apply(mode)}
-                className="flex w-full items-center justify-between rounded-md border border-border px-3 py-2 text-left text-sm transition-colors hover:bg-surface-muted disabled:cursor-default disabled:opacity-60"
+                className="flex w-full items-center justify-between rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2 text-left text-sm transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 disabled:cursor-default disabled:opacity-60"
               >
                 <span className="flex flex-col">
                   <StudyModeBadge mode={mode} />
-                  <span className="mt-1 text-xs text-muted">
+                  <span className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     {mode === 'pretest'
                       ? 'IIA = 0 · el módulo de IA queda bloqueado (O₁)'
                       : mode === 'postest'

@@ -48,7 +48,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es-PE" className={`${inter.variable} ${poppins.variable}`}>
-      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
+      <body className="min-h-screen bg-slate-50 dark:bg-slate-950 font-[family-name:var(--font-inter)] text-slate-900 dark:text-slate-100 antialiased">
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>

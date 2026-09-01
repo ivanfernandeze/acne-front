@@ -99,7 +99,7 @@ export default function CapturaPage() {
     <div className="space-y-4">
       <Link
         href="/app"
-        className="flex items-center gap-1 text-sm text-muted hover:text-foreground"
+        className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Volver
@@ -108,17 +108,17 @@ export default function CapturaPage() {
       <Card>
         <CardBody className="space-y-4">
           <div className="space-y-1">
-            <h2 className="font-display text-base font-semibold text-foreground">
+            <h2 className="font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">
               Guía de encuadre
             </h2>
-            <ul className="list-disc space-y-0.5 pl-4 text-sm text-muted">
+            <ul className="list-disc space-y-0.5 pl-4 text-sm text-slate-500 dark:text-slate-400">
               <li>Rostro completo dentro del óvalo, mirando de frente.</li>
               <li>Luz frontal y uniforme; evite contraluces y sombras duras.</li>
               <li>Distancia aproximada de 30 cm, sin maquillaje ni filtros.</li>
             </ul>
           </div>
 
-          <div className="relative aspect-square overflow-hidden rounded-lg bg-surface-muted">
+          <div className="relative aspect-square overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800">
             {stage === 'captured' && preview !== null ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={preview} alt="Fotografía capturada" className="h-full w-full object-cover" />
@@ -146,14 +146,14 @@ export default function CapturaPage() {
                     stroke="currentColor"
                     strokeWidth="0.8"
                     strokeDasharray="3 2"
-                    className="text-accent"
+                    className="text-cyan-700 dark:text-cyan-400"
                   />
                 </svg>
               </>
             )}
 
             {stage === 'idle' ? (
-              <div className="absolute inset-0 flex items-center justify-center bg-surface-muted">
+              <div className="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-slate-800">
                 <Button onClick={() => void start()}>
                   <Camera className="h-4 w-4" aria-hidden />
                   Activar cámara
@@ -194,7 +194,7 @@ export default function CapturaPage() {
                   Enviar al centro
                 </Button>
               </div>
-              <p className="text-xs text-muted">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 El envío directo desde la app requiere vincular su cuenta con el centro. Mientras
                 tanto, muestre esta fotografía en consulta o envíela por el canal que le indicaron.
               </p>
@@ -202,7 +202,7 @@ export default function CapturaPage() {
           ) : null}
 
           {stage !== 'captured' ? (
-            <p className="flex items-start gap-2 text-xs text-muted">
+            <p className="flex items-start gap-2 text-xs text-slate-500 dark:text-slate-400">
               <Sun className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
               La fotografía no sale de su teléfono hasta que usted decida enviarla.
             </p>

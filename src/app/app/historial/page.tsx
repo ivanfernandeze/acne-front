@@ -15,7 +15,7 @@ export default function HistorialPage() {
     <div className="space-y-4">
       <Link
         href="/app"
-        className="flex items-center gap-1 text-sm text-muted hover:text-foreground"
+        className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Volver
@@ -23,11 +23,11 @@ export default function HistorialPage() {
 
       <Card>
         <CardBody className="space-y-3 text-center">
-          <Clock className="mx-auto h-7 w-7 text-muted" aria-hidden />
-          <h2 className="font-display text-base font-semibold text-foreground">
+          <Clock className="mx-auto h-7 w-7 text-slate-500 dark:text-slate-400" aria-hidden />
+          <h2 className="font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">
             Historial no disponible todavía
           </h2>
-          <p className="text-sm text-muted">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Para mostrarle sus casos necesitamos vincular esta aplicación con su identidad en el
             centro, con su consentimiento. Mientras tanto, el dermatólogo le informará el resultado
             de cada evaluación en consulta.

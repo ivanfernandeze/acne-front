@@ -45,8 +45,8 @@ export default function CasosPage() {
     <div className="space-y-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-xl font-bold text-foreground">Bandeja de casos</h1>
-          <p className="mt-1 text-sm text-muted">
+          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">Bandeja de casos</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Cada caso se mide dos veces: una sin IA (O₁) y otra con IA (O₂). Es su propio control.
           </p>
         </div>
@@ -63,7 +63,7 @@ export default function CasosPage() {
         />
         <CardBody className="flex flex-wrap items-center gap-4">
           <label className="flex items-center gap-2 text-sm">
-            <span className="text-muted">Estado</span>
+            <span className="text-slate-500 dark:text-slate-400">Estado</span>
             <Select
               value={status}
               onChange={(event) => setStatus(event.target.value)}
@@ -83,12 +83,12 @@ export default function CasosPage() {
               type="checkbox"
               checked={pending}
               onChange={(event) => setPending(event.target.checked)}
-              className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+              className="h-4 w-4 rounded border-slate-200 dark:border-slate-700 text-sky-900 dark:text-sky-400 focus:ring-sky-900 dark:focus:ring-sky-400"
             />
             <span>
               Solo pendientes en mi condición actual
               {user !== null ? (
-                <span className="ml-1 text-muted">({user.studyMode})</span>
+                <span className="ml-1 text-slate-500 dark:text-slate-400">({user.studyMode})</span>
               ) : null}
             </span>
           </label>
@@ -98,7 +98,7 @@ export default function CasosPage() {
               type="checkbox"
               checked={includeSynthetic}
               onChange={(event) => setIncludeSynthetic(event.target.checked)}
-              className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+              className="h-4 w-4 rounded border-slate-200 dark:border-slate-700 text-sky-900 dark:text-sky-400 focus:ring-sky-900 dark:focus:ring-sky-400"
             />
             Incluir casos sintéticos
           </label>
@@ -136,7 +136,7 @@ export default function CasosPage() {
                 {(cases.data ?? []).map((item) => (
                   <Tr key={item.id}>
                     <Td>
-                      <span className="font-mono text-sm font-medium text-foreground">
+                      <span className="font-mono text-sm font-medium text-slate-900 dark:text-slate-100">
                         {item.caseCode}
                       </span>
                       {item.isSynthetic ? (
@@ -145,7 +145,7 @@ export default function CasosPage() {
                         </Badge>
                       ) : null}
                     </Td>
-                    <Td className="font-mono text-xs text-muted">{item.patientCode}</Td>
+                    <Td className="font-mono text-xs text-slate-500 dark:text-slate-400">{item.patientCode}</Td>
                     <Td>
                       <StudyModeBadge mode={item.studyMode} />
                     </Td>
@@ -156,11 +156,11 @@ export default function CasosPage() {
                     </Td>
                     <Td className="text-sm">{item.assignedUserName ?? '—'}</Td>
                     <Td numeric>{item.imageCount}</Td>
-                    <Td className="text-sm text-muted">{date(item.createdAt)}</Td>
+                    <Td className="text-sm text-slate-500 dark:text-slate-400">{date(item.createdAt)}</Td>
                     <Td>
                       <Link
                         href={`/portal/casos/${item.id}`}
-                        className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                        className="flex items-center gap-1 text-sm font-medium text-sky-900 dark:text-sky-400 hover:underline"
                       >
                         Revisar
                         <ChevronRight className="h-4 w-4" aria-hidden />

@@ -63,7 +63,7 @@ describe('IndicatorCard', () => {
     render(<IndicatorCard data={build()} />);
 
     const change = screen.getByText('-31,4 %');
-    expect(change.className).toContain('text-success');
+    expect(change.className).toContain('text-emerald-700 dark:text-emerald-400');
   });
 
   it('treats a drop as a regression for a `higher is better` indicator', () => {
@@ -90,7 +90,7 @@ describe('IndicatorCard', () => {
     );
 
     const change = screen.getByText('-12,5 %');
-    expect(change.className).toContain('text-danger');
+    expect(change.className).toContain('text-red-700 dark:text-red-400');
   });
 
   it('shows the declared alert when the target is not met', () => {

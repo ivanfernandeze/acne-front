@@ -41,10 +41,10 @@ export default function IndicadoresPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-xl font-bold text-foreground">
+          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">
             Indicadores de la variable dependiente
           </h1>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             TRM · TPD · TSP · TCAD, comparados entre las condiciones O₁ (pretest, sin IA) y O₂
             (postest, con IA).
           </p>
@@ -70,12 +70,12 @@ export default function IndicadoresPage() {
         </div>
       </header>
 
-      <label className="flex w-fit items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-sm">
+      <label className="flex w-fit items-center gap-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm">
         <input
           type="checkbox"
           checked={includeSynthetic}
           onChange={(event) => setIncludeSynthetic(event.target.checked)}
-          className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+          className="h-4 w-4 rounded border-slate-200 dark:border-slate-700 text-sky-900 dark:text-sky-400 focus:ring-sky-900 dark:focus:ring-sky-400"
         />
         Incluir datos sintéticos de demostración
       </label>
@@ -104,9 +104,9 @@ export default function IndicadoresPage() {
             .filter((i) => i.pretest !== null || i.postest !== null)
             .map((indicator) => (
               <div key={indicator.indicator}>
-                <p className="mb-2 text-sm font-medium text-foreground">
+                <p className="mb-2 text-sm font-medium text-slate-900 dark:text-slate-100">
                   {indicator.indicator} — {indicator.definition.name}{' '}
-                  <span className="text-muted">({indicator.definition.unit})</span>
+                  <span className="text-slate-500 dark:text-slate-400">({indicator.definition.unit})</span>
                 </p>
                 <ComparisonBar
                   unit={indicator.definition.unit}
@@ -149,12 +149,12 @@ export default function IndicadoresPage() {
                 {
                   label: 'Pretest',
                   values: trm?.pretest?.observations ?? [],
-                  colorClass: 'text-pretest',
+                  colorClass: 'text-slate-500 dark:text-slate-400',
                 },
                 {
                   label: 'Postest',
                   values: trm?.postest?.observations ?? [],
-                  colorClass: 'text-postest',
+                  colorClass: 'text-cyan-700 dark:text-cyan-400',
                 },
               ]}
             />
@@ -173,12 +173,12 @@ export default function IndicadoresPage() {
                 {
                   label: 'Pretest',
                   values: tcad?.pretest?.observations ?? [],
-                  colorClass: 'text-pretest',
+                  colorClass: 'text-slate-500 dark:text-slate-400',
                 },
                 {
                   label: 'Postest',
                   values: tcad?.postest?.observations ?? [],
-                  colorClass: 'text-postest',
+                  colorClass: 'text-cyan-700 dark:text-cyan-400',
                 },
               ]}
             />
@@ -197,7 +197,7 @@ export default function IndicadoresPage() {
           ) : classification.error !== null ? (
             <ErrorState message={classification.error.message} onRetry={classification.reload} />
           ) : classification.data === null || classification.data.total === 0 ? (
-            <p className="py-6 text-center text-sm text-muted">
+            <p className="py-6 text-center text-sm text-slate-500 dark:text-slate-400">
               Todavía no hay casos con patrón de referencia y predicción de la IA.
             </p>
           ) : (
@@ -228,25 +228,25 @@ export default function IndicadoresPage() {
 
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-sm">
-                  <thead className="bg-surface-muted">
+                  <thead className="bg-slate-100 dark:bg-slate-800">
                     <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted">
+                      <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                         Clase IGA
                       </th>
                       {['Soporte', 'Precisión', 'Sensibilidad', 'Especificidad', 'F1'].map((h) => (
                         <th
                           key={h}
-                          className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-muted"
+                          className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
                         >
                           {h}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border">
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                     {classification.data.perClass.map((row) => (
                       <tr key={row.igaClass}>
-                        <td className="px-3 py-2 text-foreground">
+                        <td className="px-3 py-2 text-slate-900 dark:text-slate-100">
                           {catalogs?.iga.labels[row.igaClass] ?? row.igaClass}
                         </td>
                         <td className="px-3 py-2 text-right tabular-nums">{row.support}</td>
@@ -262,7 +262,7 @@ export default function IndicadoresPage() {
                 </table>
               </div>
 
-              <p className="text-xs text-muted">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Patrón de evaluación: <strong>{classification.data.standard}</strong>. Referencia de
                 calibración: Watanabe (2025) reporta 90,0 % de exactitud y F1 macro 0,885.
               </p>
@@ -276,9 +276,9 @@ export default function IndicadoresPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-border px-3 py-2">
-      <p className="text-xs text-muted">{label}</p>
-      <p className="font-display text-lg font-semibold tabular-nums text-foreground">{value}</p>
+    <div className="rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2">
+      <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="font-[family-name:var(--font-poppins)] text-lg font-semibold tabular-nums text-slate-900 dark:text-slate-100">{value}</p>
     </div>
   );
 }

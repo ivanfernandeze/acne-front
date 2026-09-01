@@ -46,10 +46,10 @@ export default function PortalHomePage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-xl font-bold text-foreground">
+          <h1 className="font-[family-name:var(--font-poppins)] text-xl font-bold text-slate-900 dark:text-slate-100">
             Hola, {user?.fullName ?? ''}
           </h1>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Diseño preexperimental pretest–postest de un solo grupo · G: O₁ → X → O₂ · censo de 30
             casos.
           </p>
@@ -64,7 +64,7 @@ export default function PortalHomePage() {
           profesional.
           <Link
             href="/portal/encuesta"
-            className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-sky-900 dark:text-sky-400 hover:underline"
           >
             Responder ahora <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
@@ -82,7 +82,7 @@ export default function PortalHomePage() {
       ) : null}
 
       <section>
-        <h2 className="mb-3 font-display text-base font-semibold text-foreground">
+        <h2 className="mb-3 font-[family-name:var(--font-poppins)] text-base font-semibold text-slate-900 dark:text-slate-100">
           Indicadores de la variable dependiente
         </h2>
         {dashboard.loading ? (
@@ -119,10 +119,10 @@ export default function PortalHomePage() {
             {(coverage.data?.entries ?? []).map((entry) => (
               <div
                 key={entry.objective}
-                className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2 text-sm"
+                className="flex items-center justify-between gap-3 rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm"
               >
-                <span className="font-medium text-foreground">{entry.objective}</span>
-                <span className="min-w-0 flex-1 truncate text-xs text-muted">
+                <span className="font-medium text-slate-900 dark:text-slate-100">{entry.objective}</span>
+                <span className="min-w-0 flex-1 truncate text-xs text-slate-500 dark:text-slate-400">
                   {entry.indicator ?? '—'}
                 </span>
                 <Badge
@@ -140,7 +140,7 @@ export default function PortalHomePage() {
             ))}
             <Link
               href="/portal/auditoria"
-              className="inline-flex items-center gap-1 pt-1 text-sm font-medium text-primary hover:underline"
+              className="inline-flex items-center gap-1 pt-1 text-sm font-medium text-sky-900 dark:text-sky-400 hover:underline"
             >
               Ver panel de auditoría <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
@@ -163,17 +163,17 @@ export default function PortalHomePage() {
                     `${report.file}.pdf`,
                   )
                 }
-                className="flex w-full items-center gap-3 rounded-md border border-border px-3 py-2 text-left text-sm transition-colors hover:border-primary hover:bg-surface-muted"
+                className="flex w-full items-center gap-3 rounded-md border border-slate-200 dark:border-slate-700 px-3 py-2 text-left text-sm transition-colors hover:border-sky-900 dark:hover:border-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800"
               >
-                <FileDown className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+                <FileDown className="h-4 w-4 shrink-0 text-sky-900 dark:text-sky-400" aria-hidden />
                 <span className="min-w-0 flex-1">
-                  <span className="block font-medium text-foreground">{report.label}</span>
-                  <span className="block text-xs text-muted">{report.objective}</span>
+                  <span className="block font-medium text-slate-900 dark:text-slate-100">{report.label}</span>
+                  <span className="block text-xs text-slate-500 dark:text-slate-400">{report.objective}</span>
                 </span>
               </button>
             ))}
-            <p className="flex items-start gap-2 pt-1 text-xs text-muted">
-              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" aria-hidden />
+            <p className="flex items-start gap-2 pt-1 text-xs text-slate-500 dark:text-slate-400">
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />
               La primera generación puede tardar: el servidor arranca Chromium para renderizar el
               PDF.
             </p>
@@ -182,7 +182,7 @@ export default function PortalHomePage() {
       </div>
 
       {catalogs !== null ? (
-        <p className="rounded-md border border-danger/30 bg-danger-soft px-4 py-3 text-xs text-foreground">
+        <p className="rounded-md border border-red-500/30 dark:border-red-400/30 bg-red-50 dark:bg-red-950 px-4 py-3 text-xs text-slate-900 dark:text-slate-100">
           <strong className="font-semibold">Aviso:</strong> {catalogs.disclaimer}
         </p>
       ) : null}
