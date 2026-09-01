@@ -1,0 +1,20 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Generado por `pnpm generate:api-types` desde el OpenAPI de acne-api.
+# Se versiona para que el CI compile sin necesidad de levantar el backend.
+# src/types/api-schema.d.ts
+
+.vercel
+.DS_Store
+Thumbs.db

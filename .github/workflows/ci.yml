@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  quality:
+    name: Lint · Tailwind-only · Typecheck · Test · Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile=false
+
+      # Regla dura de la Seccion 12.3: sin CSS personalizado fuera de globals.css.
+      - name: Politica Tailwind-only
+        run: pnpm lint:css
+
+      - name: Lint
+        run: pnpm lint
+
+      # `src/types/api-schema.d.ts` esta versionado, de modo que el CI compila contra el contrato
+      # sin necesidad de levantar acne-api.
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001/api

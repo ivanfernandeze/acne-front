@@ -1,0 +1,39 @@
+# Changelog — acne-web
+
+Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/);
+versionado con [SemVer](https://semver.org/lang/es/).
+
+## [0.1.0] — 2026-08-31
+
+### Added
+
+- **Portal del dermatólogo** (`/portal/**`): resumen con indicadores y entregables, bandeja de
+  casos con filtro por condición, ficha de caso con cronómetro invisible y bloqueo de IA en
+  pretest, panel de indicadores con boxplots y matriz de confusión, análisis estadístico de un
+  clic, Anexos 4/5/7 digitalizados, cuestionario Likert, panel de jornada y panel de auditoría.
+- **PWA del paciente** (`/app/**`): captura guiada con `getUserMedia`, guía de encuadre en SVG,
+  manifest y service worker que cachea solo el *shell* — nunca imágenes clínicas ni respuestas de
+  la API.
+- **Cliente tipado desde OpenAPI**: `pnpm generate:api-types` genera `src/types/api-schema.d.ts`
+  desde el documento de `acne-api`. Ningún tipo de respuesta se escribe a mano.
+- **Política Tailwind-only verificada**: `scripts/check-no-custom-css.mjs` (`pnpm lint:css`) falla
+  si aparece cualquier `.css` fuera de `globals.css`, o si `globals.css` contiene algo distinto de
+  las tres directivas `@tailwind` y las variables de tema en `:root`/`.dark`. Conectado al CI.
+- **Componentes propios** al estilo shadcn/ui con `class-variance-authority`, `clsx` y
+  `tailwind-merge`; iconos de `lucide-react`; fuentes Inter/Poppins vía `next/font`.
+- **Boxplot en SVG** escrito a mano (Recharts no tiene uno nativo) con convención de Tukey.
+- Pruebas con Vitest + Testing Library sobre los componentes críticos.
+
+### Fixed
+
+- **Separador decimal.** El formato numérico usaba el locale `es-PE`, que en CLDR emplea el punto
+  decimal. La tesis y los reportes PDF usan la coma, de modo que el tablero mostraba «8.78» donde
+  el reporte imprimía «8,78» — una invitación a errores de transcripción en el capítulo de
+  resultados. El locale se fija ahora a la convención del documento, no a la del país.
+
+### Notes
+
+- `buttonVariants` vive en `components/ui/button-variants.ts`, un módulo **sin** `'use client'`.
+  Los componentes de servidor lo invocan para dar aspecto de botón a un `<Link>`; exportarlo desde
+  el archivo del componente cliente entregaría al servidor una referencia de cliente en lugar de
+  la función y el prerenderizado fallaría con «(0 , l.d) is not a function».

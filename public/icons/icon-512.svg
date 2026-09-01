@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Diagnóstico asistido de acné">
+  <rect width="512" height="512" rx="92" fill="#123a5c"/>
+  <circle cx="256" cy="230" r="112" fill="none" stroke="#5cc9e0" stroke-width="18"/>
+  <circle cx="214" cy="204" r="16" fill="#5cc9e0"/>
+  <circle cx="294" cy="246" r="13" fill="#5cc9e0"/>
+  <circle cx="246" cy="278" r="11" fill="#5cc9e0"/>
+  <path d="M166 374h180" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
+  <path d="M198 416h116" stroke="#ffffff" stroke-width="18" stroke-linecap="round" opacity="0.6"/>
+</svg>
