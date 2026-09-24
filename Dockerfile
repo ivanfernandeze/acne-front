@@ -15,7 +15,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Baked into the client bundle, so it must be known at build time.
-ARG NEXT_PUBLIC_API_URL=http://localhost:3001/api
+# Left EMPTY by default: src/lib/api.ts then calls http://<host the page was opened from>:3001/api,
+# which is what makes the phone capture work over the LAN. A literal `localhost` here would make
+# the phone that scans the QR call itself.
+ARG NEXT_PUBLIC_API_URL=
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -42,4 +45,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=25s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:3000/',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))"
 
-CMD ["pnpm", "start"]
+# next directly, not `pnpm start`: corepack would try to download pnpm at runtime as user acne.
+CMD ["node_modules/.bin/next", "start", "-p", "3000", "-H", "0.0.0.0"]

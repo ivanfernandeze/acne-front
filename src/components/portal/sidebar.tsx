@@ -4,8 +4,9 @@ import { Activity, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { NAV_GROUPS, isActive } from '@/components/portal/navigation';
 import { cn } from '@/lib/cn';
+import { isActive, portalHref } from '@/lib/portals';
+import { usePortal } from '@/lib/use-portal';
 
 /**
  * Portal sidebar.
@@ -26,6 +27,11 @@ export function Sidebar({
   onCloseMobile: () => void;
 }) {
   const pathname = usePathname();
+  // The menu is no longer filtered by role at render time: each portal declares the sections it
+  // has, and a role only ever reaches its own portal. What used to be a runtime condition on every
+  // item is now a property of the URL (RF-TR-02).
+  const { portal } = usePortal();
+  const groups = portal.groups;
 
   // The drawer is always rendered expanded: collapsing is a desktop space trade-off, and an icon
   // rail inside an overlay that already covers the screen would only make it harder to read.
@@ -33,18 +39,20 @@ export function Sidebar({
     <>
       <div
         className={cn(
-          'flex h-16 shrink-0 items-center gap-2 border-b border-slate-200 px-4 dark:border-slate-700',
+          'flex h-16 shrink-0 items-center gap-2 border-b border-neutral-200 px-4',
           collapsed && 'justify-center px-0',
         )}
       >
-        <Activity className="h-6 w-6 shrink-0 text-sky-900 dark:text-sky-400" aria-hidden />
+        <Activity className="h-6 w-6 shrink-0 text-purple-900" aria-hidden />
         {!collapsed ? (
           <div className="min-w-0">
-            <p className="truncate font-(family-name:--font-poppins) text-sm font-bold text-slate-900 dark:text-slate-100">
+            <p className="truncate text-sm font-bold text-neutral-900">
               Acné UNT
             </p>
-            <p className="truncate text-[11px] text-slate-500 dark:text-slate-400">
-              Diagnóstico asistido
+            {/* Which portal this is, not a tagline: the same chrome serves three of them and the
+                header is where someone confirms they are in the right one. */}
+            <p className="truncate text-[11px] text-neutral-500">
+              {portal.label}
             </p>
           </div>
         ) : null}
@@ -52,7 +60,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onCloseMobile}
-          className="ml-auto rounded-md p-1.5 text-slate-500 hover:bg-slate-100 lg:hidden dark:text-slate-400 dark:hover:bg-slate-800"
+          className="ml-auto rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 lg:hidden"
         >
           <X className="h-5 w-5" aria-hidden />
           <span className="sr-only">Cerrar menú</span>
@@ -60,43 +68,43 @@ export function Sidebar({
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-3">
-        {NAV_GROUPS.map((group, groupIndex) => (
+        {groups.map((group, groupIndex) => (
           <div key={group.title ?? `group-${groupIndex}`} className={groupIndex > 0 ? 'mt-5' : ''}>
             {group.title !== null && !collapsed ? (
-              <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
                 {group.title}
               </p>
             ) : null}
             {group.title !== null && collapsed ? (
-              <div className="mx-3 mb-2 border-t border-slate-200 dark:border-slate-700" />
+              <div className="mx-3 mb-2 border-t border-neutral-200" />
             ) : null}
 
             <ul className="space-y-0.5">
               {group.items.map((item) => {
-                const active = isActive(item, pathname);
+                const active = isActive(portal, item, pathname ?? '');
                 const Icon = item.icon;
                 return (
-                  <li key={item.href}>
+                  <li key={item.path}>
                     <Link
-                      href={item.href}
+                      href={portalHref(portal.slug, item.path)}
                       onClick={onCloseMobile}
                       aria-current={active ? 'page' : undefined}
                       title={collapsed ? item.label : (item.objective ?? undefined)}
                       className={cn(
                         'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-900 dark:focus-visible:ring-sky-400',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-900',
                         collapsed && 'justify-center px-0',
                         active
-                          ? 'bg-sky-50 font-medium text-sky-900 dark:bg-sky-950 dark:text-sky-300'
-                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
+                          ? 'bg-purple-50 font-medium text-purple-900'
+                          : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
                       )}
                     >
                       <Icon
                         className={cn(
                           'h-4.5 w-4.5 shrink-0',
                           active
-                            ? 'text-sky-900 dark:text-sky-400'
-                            : 'text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-300',
+                            ? 'text-purple-900'
+                            : 'text-neutral-400 group-hover:text-neutral-600',
                         )}
                         aria-hidden
                       />
@@ -104,7 +112,7 @@ export function Sidebar({
                         <span className="min-w-0 flex-1">
                           <span className="block truncate">{item.label}</span>
                           {item.hint !== undefined ? (
-                            <span className="block truncate text-[11px] font-normal text-slate-400 dark:text-slate-500">
+                            <span className="block truncate text-[11px] font-normal text-neutral-400">
                               {item.hint}
                             </span>
                           ) : null}
@@ -119,13 +127,13 @@ export function Sidebar({
         ))}
       </nav>
 
-      <div className="shrink-0 border-t border-slate-200 p-2 dark:border-slate-700">
+      <div className="shrink-0 border-t border-neutral-200 p-2">
         <button
           type="button"
           onClick={onToggleCollapsed}
           className={cn(
-            'hidden w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-500 transition-colors lg:flex',
-            'hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
+            'hidden w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-neutral-500 transition-colors lg:flex',
+            'hover:bg-neutral-100 hover:text-neutral-900',
             collapsed && 'justify-center px-0',
           )}
           title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
@@ -149,8 +157,8 @@ export function Sidebar({
       {/* Desktop rail */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-slate-200 bg-white transition-[width] duration-200 lg:flex',
-          'dark:border-slate-700 dark:bg-slate-900',
+          'fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-neutral-200 bg-white transition-[width] duration-200 lg:flex',
+          '',
           collapsed ? 'w-16' : 'w-64',
         )}
       >
@@ -164,9 +172,9 @@ export function Sidebar({
             type="button"
             aria-label="Cerrar menú"
             onClick={onCloseMobile}
-            className="absolute inset-0 bg-slate-900/50"
+            className="absolute inset-0 bg-neutral-900/50"
           />
-          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col border-r border-neutral-200 bg-white">
             {renderContent(false)}
           </aside>
         </div>

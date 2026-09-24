@@ -5,7 +5,7 @@ import { cn } from '@/lib/cn';
 export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm', className)}
+      className={cn('rounded-lg border border-neutral-200 bg-white shadow-sm', className)}
       {...props}
     />
   );
@@ -25,14 +25,14 @@ export function CardHeader({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 dark:border-slate-700 px-5 py-4',
+        'flex flex-wrap items-start justify-between gap-3 border-b border-neutral-200 px-5 py-4',
         className,
       )}
     >
       <div className="min-w-0">
-        <h2 className="font-(family-name:--font-poppins) text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
+        <h2 className="text-base font-semibold text-neutral-900">{title}</h2>
         {description !== undefined ? (
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
+          <p className="mt-1 text-sm text-neutral-500">{description}</p>
         ) : null}
       </div>
       {action !== undefined ? <div className="shrink-0">{action}</div> : null}
@@ -47,7 +47,7 @@ export function CardBody({ className, ...props }: HTMLAttributes<HTMLDivElement>
 export function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('border-t border-slate-200 dark:border-slate-700 px-5 py-3 text-sm text-slate-500 dark:text-slate-400', className)}
+      className={cn('border-t border-neutral-200 px-5 py-3 text-sm text-neutral-500', className)}
       {...props}
     />
   );

@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import { ServiceWorkerRegistration } from '@/components/pwa/service-worker-registration';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { DISCLAIMER } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: 'App del paciente',
@@ -19,25 +17,21 @@ export const metadata: Metadata = {
  */
 export default function PatientAppLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-slate-50 dark:bg-slate-950">
+    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-neutral-50">
       <ServiceWorkerRegistration />
-      <header className="flex items-start justify-between gap-3 border-b border-slate-200 bg-white px-5 py-4 dark:border-slate-700 dark:bg-slate-900">
+      <header className="flex items-start justify-between gap-3 border-b border-neutral-200 bg-white px-5 py-4">
         <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">
             Centro dermatológico
           </p>
-          <h1 className="font-(family-name:--font-poppins) text-lg font-bold text-slate-900 dark:text-slate-100">
+          <h1 className="text-lg font-bold text-neutral-900">
             Seguimiento de acné
           </h1>
         </div>
-        <ThemeToggle className="shrink-0" />
       </header>
 
       <main className="flex-1 px-5 py-5">{children}</main>
 
-      <footer className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-3 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
-        {DISCLAIMER}
-      </footer>
     </div>
   );
 }

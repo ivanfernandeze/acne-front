@@ -17,8 +17,15 @@ documento maestro:
 
 | Ruta | Experiencia |
 |---|---|
-| `/portal/**` | Portal del dermatólogo: pacientes e historia clínica, casos, diagnóstico, indicadores, estadística, anexos, auditoría |
+| `/admin/**` | Portal del administrador: pacientes, casos, indicadores, estadística, anexos, usuarios y auditoría |
+| `/dermatologo/**` | Portal de consulta: pacientes e historia clínica, casos, anamnesis, diagnóstico cronometrado, jornada, indicadores, encuesta y anexos |
+| `/tecnico/**` | Portal de admisión: pacientes, alta de caso, anamnesis y código QR de captura. Nada del análisis del estudio |
+| `/captura/<token>` | Envío de fotografías desde el teléfono, abierto con el código QR del ingreso. Sin sesión |
 | `/app/**` | PWA del paciente: captura guiada de imagen e historial |
+
+El inicio de sesión lleva a cada cuenta a su portal según el rol; no hay una pantalla intermedia
+donde elegir. Un enlace al portal ajeno redirige al propio en silencio: quien lo abrió no hizo nada
+mal, y una pantalla de error solo le enseñaría que el sistema es poco fiable.
 
 > **Aviso:** Herramienta de apoyo diagnóstico con fines de investigación académica. No sustituye el
 > juicio clínico del profesional médico. Prototipo académico UNT — no certificado como dispositivo
@@ -54,16 +61,16 @@ directivas `@tailwind` más las variables del tema en `:root`/`.dark`; en este p
 ```css
 /* src/app/globals.css — el archivo completo */
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
 ```
 
-La segunda línea no es decoración: Tailwind v4 compila `dark:` como
-`@media (prefers-color-scheme: dark)` y JavaScript no puede sobrescribir una media query. Atar la
-variante a una clase es lo único que permite ofrecer un conmutador manual Claro / Oscuro / Sistema.
+Una línea. Hasta el 05/09/2026 había una segunda, `@custom-variant dark`, que ataba la variante
+`dark:` a una clase para que un conmutador manual pudiera imponerse sobre la media query del
+sistema operativo. La interfaz es **solo clara** desde entonces, así que la variante y el
+conmutador desaparecieron junto con 653 clases `dark:` repartidas por 55 ficheros.
 
 - **No hay tema propio ni variables CSS.** Los componentes usan la paleta que trae Tailwind
-  (`bg-white`, `text-slate-900`, `bg-sky-900`, `dark:bg-slate-900`…). No existe
-  `tailwind.config.ts`: Tailwind v4 detecta el contenido por su cuenta.
+  (`bg-white`, `text-neutral-900`, `bg-purple-900`…). No existe `tailwind.config.ts`: Tailwind v4
+  detecta el contenido por su cuenta.
 - **No hay ningún otro archivo de estilos.** Prohibidos `.css`/`.scss`/`.module.css` adicionales,
   `@apply`, `@layer components`, `@theme`, `@font-face` y cualquier selector.
 - Los patrones repetidos se abstraen como componentes React (`<Button variant="primary">`,
@@ -71,30 +78,38 @@ variante a una clase es lo único que permite ofrecer un conmutador manual Claro
 - Composición con `cn()` = `clsx` + `tailwind-merge`. Iconos de `lucide-react`. Fuentes Inter y
   Poppins vía `next/font`, aplicadas como valor arbitrario —
   `font-[family-name:var(--font-poppins)]` — para no necesitar configuración.
-- **Color de la condición experimental:** `slate` para pretest (sin IA) y `cyan` para postest (con
-  IA), de forma consistente en todo el portal. El profesional nunca debe dudar de bajo qué
-  condición está registrando.
+- **Color de la condición experimental:** `neutral` para pretest (sin IA) y `violet` para postest
+  (con IA), de forma consistente en todo el portal. El profesional nunca debe dudar de bajo qué
+  condición está registrando. El gris del pretest no es un descuido: pretest es la condición **sin**
+  la herramienta, y darle un color de marca sugeriría que es una variante de lo mismo y no su
+  ausencia.
 
 ```bash
 pnpm lint:css
 ```
 
-`scripts/check-no-custom-css.mjs` exige que `globals.css` contenga **exactamente** esas dos líneas
-y nada más, y que no exista ningún otro CSS. Falla con un mensaje concreto y está conectado al CI.
+`scripts/check-no-custom-css.mjs` exige que `globals.css` contenga **exactamente** esa línea y
+nada más, y que no exista ningún otro CSS. Falla con un mensaje concreto y está conectado al CI.
 
-### Modo claro / oscuro
+### Paleta
 
-Conmutador de tres estados en la barra superior: **Claro · Oscuro · Sistema**. `system` es un
-estado real, no un sinónimo del tema actual del sistema operativo: si el usuario lo elige, el
-portal sigue al SO aunque este cambie a mitad de sesión; si elige claro u oscuro, no.
+Un solo modo, **claro**, y dos acentos de la misma familia:
 
-- La elección se guarda en `localStorage`.
-- Un script en línea en `<head>` aplica el tema **antes del primer pintado**, para que quien use
-  oscuro no vea un destello blanco al cargar.
-- Se fija también `color-scheme` en el elemento raíz, de modo que barras de desplazamiento y
-  controles nativos acompañen al tema.
-- Los gráficos de Recharts leen el tema resuelto y cambian su paleta: sin eso, el tooltip sería
-  una caja blanca sobre una página oscura.
+| Rol | Color | Dónde |
+|---|---|---|
+| Marca | `purple` | Cromo, botones primarios, enlaces, elemento activo del menú, anillos de foco |
+| Datos | `violet` | Serie postest de los gráficos, insignia de postest, PWA del paciente |
+| Acuerdo / meta cumplida | `emerald` | Diagonal de la matriz de confusión, insignias de meta |
+| Error / aviso | `red` · `amber` | Fuera de la diagonal, alertas |
+| Todo lo demás | `neutral` | Superficies, texto, bordes, y la serie **pretest** |
+
+Los tres últimos son **semánticos y no siguen a la marca**: verde significa acertado y rojo
+equivocado, y repintarlos de violeta costaría la única lectura para la que existe una matriz de
+confusión.
+
+Los gráficos de Recharts se estilan por props y atributos SVG, no por clases, así que su paleta se
+repite como literales hexadecimales con la clase que representan anotada al lado. Esa anotación es
+lo único que impide que el gráfico y el portal que lo rodea se separen.
 
 ### 2. Cero tipos escritos a mano
 
@@ -137,11 +152,19 @@ estudio:
   — que es exactamente lo que es un jurado de tesis.
 - En móvil se abre como cajón, siempre expandido.
 - La barra superior queda con lo que debe verse en toda pantalla: dónde estás, **bajo qué
-  condición experimental estás registrando**, el tema y quién eres.
+  condición experimental estás registrando** y quién eres.
 
-`src/components/portal/navigation.ts` es la definición única: el sider la renderiza y la barra
-superior deriva de ella el título, así que una ruta no puede quedar etiquetada de una forma en el
-menú y de otra en la cabecera.
+`src/lib/portals.ts` es la definición única de los tres portales: qué secciones tiene cada uno, en
+qué orden y con qué título. El sider la renderiza, la barra superior deriva de ella el título y el
+armazón (`components/portal/portal-shell`) decide con ella si una ruta es alcanzable, así que una
+sección no puede quedar etiquetada de una forma en el menú y de otra en la cabecera, ni ser
+accesible por un marcador guardado desde el portal que no la tiene.
+
+Hasta la reestructuración del 05/09/2026 había **un** portal en `/portal` cuyo menú se filtraba por
+rol. Funcionaba, y escondía un problema real: cada pantalla había que leerla dos veces —como la ve
+el dermatólogo y como la ve el técnico— y nadie podía señalar el sistema y decir en qué consiste el
+trabajo de un técnico. Tres rutas convierten la frontera en un hecho de la URL en vez de en una
+condición de tiempo de ejecución, que es además lo que la tesis tiene que describir.
 
 ## Decisiones de interfaz que protegen el experimento
 
@@ -156,8 +179,8 @@ menú y de otra en la cabecera.
   concordancia que mide OE2 dejaría de significar algo.
 - **El nombre del paciente se ve, el dato se mantiene anonimizado.** RF-TR-03 cifra la identidad y
   la reserva al profesional tratante; no le pide trabajar a ciegas. La bandeja y el selector de
-  paciente muestran el nombre a `dermatologo`/`residente` — elegir de una lista de códigos es como
-  se abre el caso equivocado —, mientras que para `admin` y `evaluador_estadistico` llega en
+  paciente muestran el nombre a los roles del grupo `identity` —`dermatologo` y `tecnico`; elegir de
+  una lista de códigos es como se abre el caso equivocado—, mientras que para `admin` llega en
   `null`, y **anexos, exportaciones CSV y reportes PDF usan siempre el código**. Cada listado con
   identidad deja una entrada en la traza de auditoría.
 - **Los datos sintéticos se marcan siempre.** Cuando el tablero incluye los 30 casos de
@@ -178,7 +201,9 @@ src/
 │  ├─ layout.tsx            Fuentes, metadatos y SessionProvider
 │  ├─ page.tsx              Portada con las dos experiencias
 │  ├─ login/                Autenticación
+│  ├─ captura/[token]/      Panel móvil de fotografías, abierto por QR (sin sesión)
 │  ├─ portal/               Portal del dermatólogo
+│  │  ├─ casos/nuevo/       Asistente de ingreso: paciente → anamnesis → fotos → resumen
 │  │  ├─ pacientes/[id]/    Historia clínica longitudinal y curva de evolución IGA
 │  │  ├─ casos/[id]/        Ficha de caso: pretest y postest
 │  │  ├─ indicadores/       TRM · TPD · TSP · TCAD + boxplots + matriz de confusión
@@ -227,3 +252,86 @@ valores atípicos como puntos individuales (RF-OE4-04).
 
 Toda tanda de cambios actualiza [`../acne-infra/TRACEABILITY.md`](../acne-infra/TRACEABILITY.md) y
 este `CHANGELOG.md`.
+
+## Captura de fotografías desde el móvil
+
+El alta de caso (`/<portal>/casos/nuevo`, paso 3) genera un **código QR**. Escaneado con el teléfono,
+abre `/captura/<token>`: una página sin sesión que muestra el **código** del caso —nunca el nombre
+del paciente— y una tarjeta por cada toma del protocolo. Cada fotografía sube en cuanto se toma y
+aparece en el escritorio en unos segundos, sin recargar.
+
+### Cómo hacerlo funcionar en la clínica
+
+El teléfono y el equipo tienen que verse en la misma red, y el teléfono **no puede resolver
+`localhost`**:
+
+1. Averigüe la IP de red del equipo: `ipconfig` (busque «Dirección IPv4»).
+2. Abra los puertos 3000 y 3001 entrantes en el firewall de Windows. Sin esa regla el teléfono no
+   llega y el síntoma es un tiempo de espera mudo, sin mensaje de error.
+3. Entre al portal **por esa IP**, no por `localhost`: `http://192.168.1.50:3000`. El QR se
+   construye con el origen desde el que usted llegó, así que si entra por `localhost` el código
+   apuntará al propio teléfono. La pantalla lo advierte cuando detecta esa situación.
+4. La URL de la API se deduce del mismo host, de modo que no hace falta configurar nada más. Si
+   define `NEXT_PUBLIC_API_URL` a mano, apúntela también a la IP de red.
+
+### Por qué la página móvil no usa la cámara en pantalla
+
+Los navegadores solo exponen `getUserMedia` en **contexto seguro** —HTTPS o `localhost`—, y en la
+clínica esta página se abre por HTTP en la red local. Una vista previa en pantalla habría fallado
+justo en el dispositivo para el que existe la funcionalidad. Se usa
+`<input type="file" accept="image/*" capture="environment">`, que delega en la app de cámara del
+sistema, no necesita contexto seguro y entrega la resolución completa del sensor con enfoque y flash
+nativos — para un primer plano clínico, mejor que un fotograma de `<video>` recortado. La guía de
+encuadre pasa del óvalo en pantalla a una instrucción escrita por toma.
+
+Si algún día se sirve el portal por HTTPS (un certificado con `mkcert`, o un túnel), la página
+ofrece además la captura en línea.
+
+## Tema y tipografía
+
+**Un solo modo, claro.** Hubo un conmutador de tres estados —Claro · Oscuro · Sistema— con su
+proveedor, su script de pre-pintado y 653 clases `dark:` repartidas por 55 ficheros. Se retiró el
+05/09/2026: era una segunda apariencia que revisar en cada cambio y en cada captura de la tesis, a
+cambio de una preferencia que en una pantalla clínica compartida nadie ajustaba. Con él se fueron
+`ThemeProvider`, `ThemeToggle`, la variante `@custom-variant dark` y las paletas dobles de los
+gráficos.
+
+La paleta de grises es **`neutral`**, no `slate`. `slate` lleva croma dentro (~0,04) y sobre una
+superficie grande se lee como azul marino; `neutral` tiene croma 0 y sus luminancias caen dentro del
+1 % de las de `slate` en todos los escalones, de modo que el cambio no altera ningún contraste.
+
+El **acento es `purple`**, con `violet` como segundo acento para los datos. Ese emparejamiento es
+funcional, no decorativo: el gris identifica la condición pretest y el violeta la postest en toda la
+interfaz, de modo que el especialista distingue por color bajo qué condición está registrando. La
+marca es la misma en el isotipo, en los iconos de la PWA y en la ilustración del login, que se
+recolorearon a mano por ser SVG con colores propios y no clases.
+
+Verde, rojo y ámbar **no siguen a la marca**: son semánticos —acertado, equivocado, atención— y
+repintarlos costaría la lectura para la que existen.
+
+**Una sola familia**: Inter, en todos los pesos. Los títulos usaban Poppins; sus formas geométricas
+se leían como publicidad junto a una tabla de treinta tiempos de revisión, y las clases de peso ya
+hacían la jerarquía.
+
+Todo el color va como clase de utilidad en el JSX; `src/app/globals.css` tiene una sola línea y
+`pnpm lint:css` lo verifica en CI. Las excepciones inevitables son las paletas de Recharts, la rampa
+de la matriz de confusión y los SVG de marca, que necesitan cadenas de color y no clases: viven
+junto a su componente, con el token de Tailwind anotado al lado de cada hex.
+
+## Ilustración del login
+
+La mitad derecha del login la dibuja `src/components/brand/clinic-illustration.tsx`: un SVG hecho a
+mano que amplía el motivo del icono de la PWA. Se dibujó en vez de fotografiarse porque no hay
+ninguna fotografía clínica con licencia para el repositorio, porque una cara de banco de imágenes
+daría a entender que el prototipo ha visto un paciente real, y porque un SVG se mantiene nítido en el
+proyector de una defensa.
+
+Para usar una fotografía, deje el archivo en `public/` y sustituya el cuerpo del componente por un
+`<img>` con las mismas clases de relleno absoluto. No hay que tocar nada más.
+
+## Aviso regulatorio
+
+El aviso de RNF-06 vive en los **reportes PDF** —completo tras las referencias y abreviado al pie de
+cada página—, que es donde el requisito lo pide: «todo *reporte* incluye disclaimer». Se retiró del
+cromo de la interfaz, donde estaba repetido en cinco pantallas. La página móvil de captura conserva
+su aviso de protección de datos, que es RNF-07 y va dirigido al paciente.

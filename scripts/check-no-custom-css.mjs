@@ -2,14 +2,13 @@
 /**
  * Enforces the Tailwind-only policy.
  *
- * `src/app/globals.css` may contain exactly two lines and nothing else: the Tailwind import and
- * the declaration of the `dark` variant. No theme block, no CSS variables, no selectors — every
- * colour, spacing and font decision lives in utility classes inside the JSX, using Tailwind's own
- * palette.
+ * `src/app/globals.css` may contain exactly one line and nothing else: the Tailwind import. No
+ * theme block, no CSS variables, no selectors — every colour, spacing and font decision lives in
+ * utility classes inside the JSX, using Tailwind's own palette.
  *
- * The second line is not decoration: Tailwind v4 compiles `dark:` to
- * `@media (prefers-color-scheme: dark)` by default, which JavaScript cannot override. Binding the
- * variant to a class is the only way to offer a manual Light / Dark / System switch.
+ * It used to allow a second line, `@custom-variant dark`, which bound the `dark:` variant to a
+ * class so a manual Light / Dark / System switch could override the OS media query. The interface
+ * is light-only since 05/09/2026, so both the variant and the switch are gone.
  *
  * A convention that is not enforced is a convention that decays, so this runs in CI.
  *
@@ -25,10 +24,10 @@ const SCAN_DIRS = ['src', 'public', 'app'];
 const IGNORED_DIRS = new Set(['node_modules', '.next', 'dist', 'coverage', '.git']);
 
 const ALLOWED_STYLESHEET = join('src', 'app', 'globals.css');
-const ALLOWED_LINES = [
-  '@import "tailwindcss";',
-  '@custom-variant dark (&:where(.dark, .dark *));',
-];
+const ALLOWED_LINES = ['@import "tailwindcss";'];
+/** Concordancia de número en los mensajes: «su línea permitida» / «sus 2 líneas permitidas». */
+const LINE_COUNT =
+  ALLOWED_LINES.length === 1 ? 'su única línea permitida' : `sus ${ALLOWED_LINES.length} líneas permitidas`;
 const STYLE_EXTENSIONS = /\.(css|scss|sass|less)$/i;
 
 const errors = [];
@@ -95,5 +94,5 @@ if (errors.length > 0) {
 
 console.log(
   `✓ Política Tailwind-only respetada: ${ALLOWED_STYLESHEET.split(sep).join('/')} contiene solo ` +
-    `sus ${ALLOWED_LINES.length} líneas permitidas y no existe ningún otro CSS.`,
+    `${LINE_COUNT} y no existe ningún otro CSS.`,
 );

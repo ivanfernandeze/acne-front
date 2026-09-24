@@ -11,32 +11,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Lista el personal del estudio (solo admin). */
+        /**
+         * Lista el personal del estudio (solo admin).
+         * @description También el especialista, y solo para ver su mostrador.
+         *
+         *     El grupo de roles abre la PUERTA; lo que acota el contenido es `actorRole`, que el servicio
+         *     usa para intersecar lo pedido con lo que ese rol administra. Un `@Roles` más ancho sin esa
+         *     intersección le habría dado el listado completo del personal.
+         */
         get: operations["UsersController_findAll"];
         put?: never;
-        /** Registra un nuevo integrante del personal (solo admin). */
+        /**
+         * Registra un nuevo integrante del personal.
+         * @description El administrador crea cualquier rol; el especialista solo cuentas de `tecnico`. El límite lo pone el servicio y no la pantalla: un desplegable con una sola opción no impide un curl. Cualquier otro rol responde 403 diciendo qué se intentó crear.
+         */
         post: operations["UsersController_create"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
-        trace?: never;
-    };
-    "/api/users/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Actualiza datos de un usuario (solo admin). */
-        patch: operations["UsersController_update"];
         trace?: never;
     };
     "/api/users/me": {
@@ -56,7 +49,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/users/me/study-mode": {
+    "/api/users/me/password": {
         parameters: {
             query?: never;
             header?: never;
@@ -70,10 +63,10 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * Cambia el modo de estudio del usuario autenticado (RF-TR-01).
-         * @description Cambiar de pretest a postest equivale a aplicar la intervención X del diseño preexperimental, por lo que la acción queda registrada en la traza de auditoría. El nuevo modo solo surte efecto en los tokens emitidos después del cambio.
+         * Cambia la contraseña del usuario autenticado.
+         * @description Exige la contraseña vigente. Si no coincide responde 400, nunca 401: el portal cierra la sesión ante cualquier 401, y equivocarse al teclear no debe costar la sesión.
          */
-        patch: operations["UsersController_setStudyMode"];
+        patch: operations["UsersController_changePassword"];
         trace?: never;
     };
     "/api/users/me/consent": {
@@ -87,6 +80,44 @@ export interface paths {
         put?: never;
         /** Registra el consentimiento informado del profesional (RNF-07). */
         post: operations["UsersController_acceptConsent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Devuelve un integrante del personal por su id (solo admin). */
+        get: operations["UsersController_findOne"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualiza datos de un usuario (solo admin). */
+        patch: operations["UsersController_update"];
+        trace?: never;
+    };
+    "/api/users/{id}/password-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Genera una contraseña nueva para un usuario (solo admin).
+         * @description Devuelve la contraseña UNA sola vez; no se almacena en claro ni se registra en la auditoría. No revoca las sesiones vigentes: el token de refresco sigue siendo válido hasta que caduque. Ver la nota de seguridad abierta en TRACEABILITY.md.
+         */
+        post: operations["UsersController_resetPassword"];
         delete?: never;
         options?: never;
         head?: never;
@@ -136,7 +167,7 @@ export interface paths {
         };
         /**
          * Lista pacientes.
-         * @description Para `dermatologo` y `residente` incluye el nombre descifrado, porque elegir un paciente de una lista de códigos es como se abre el caso equivocado (RF-TR-03 reserva la identidad al profesional tratante, no le pide trabajar a ciegas). Para los demás roles `fullName` llega en `null`. El acceso en bloque queda registrado en la traza de auditoría (RNF-02).
+         * @description Para los roles que pueden ver la identidad incluye el nombre descifrado, porque elegir un paciente de una lista de códigos es como se abre el caso equivocado (RF-TR-03 reserva la identidad al profesional tratante, no le pide trabajar a ciegas). Para los demás roles `fullName` llega en `null`. El acceso en bloque queda registrado en la traza de auditoría (RNF-02).
          */
         get: operations["PatientsController_findAll"];
         put?: never;
@@ -165,7 +196,11 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Corrige la ficha de un paciente.
+         * @description Los campos de identidad están restringidos por rol además de por esta ruta: el nombre solo lo edita quien puede verlo (RF-TR-03) y el documento solo quien diagnostica. Los datos clínicos —fecha de nacimiento, sexo, fototipo— los corrige toda la mesa de admisión, y son el caso de «añadir el fototipo que se omitió en el alta».
+         */
+        patch: operations["PatientsController_update"];
         trace?: never;
     };
     "/api/patients/{id}/history": {
@@ -225,6 +260,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/patients/{id}/reinstate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revierte un retiro registrado por error (RNF-07).
+         * @description Exige motivo, a diferencia del retiro: los casos del paciente vuelven a los datasets, de modo que un `indicator_snapshot` anterior dejará de coincidir con un recálculo posterior. Queda una tercera fila en el historial de consentimientos.
+         */
+        post: operations["PatientsController_reinstate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/patients/{id}/consents": {
         parameters: {
             query?: never;
@@ -236,6 +291,387 @@ export interface paths {
         get: operations["PatientsController_consents"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cases/{caseId}/anamnesis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Anamnesis de acné del caso.
+         * @description Devuelve 404 mientras el caso no tenga anamnesis, que es lo normal hasta que el ingreso la registra. El cuestionario nunca condiciona abrir ni revisar el caso.
+         */
+        get: operations["AnamnesisController_findOne"];
+        /**
+         * Registra o actualiza la anamnesis del caso.
+         * @description Valida cada respuesta contra el catálogo de `GET /meta/catalogs`: rechaza claves desconocidas, opciones inexistentes y preguntas que no aplican al sexo y la edad del paciente. Los campos de texto libre no se cifran, de modo que no deben contener nombres ni documentos (Ley N.º 29733).
+         */
+        put: operations["AnamnesisController_save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/patients/{patientId}/anamnesis/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Última anamnesis del paciente, para precargarla en una visita nueva.
+         * @description Devuelve `null` cuando el paciente no tiene visitas previas con anamnesis, que es lo esperable en un primer control y no un error.
+         */
+        get: operations["AnamnesisController_latest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Las preguntas del ingreso, con su redacción actual.
+         * @description La clave, el tipo, el ámbito y las opciones vienen del dominio y no se editan: son el contrato que valida las respuestas ya guardadas.
+         */
+        get: operations["QuestionsController_findAll"];
+        put?: never;
+        /**
+         * Crea una pregunta nueva.
+         * @description La clave se normaliza a minúsculas sin tildes ni espacios y debe ser única: es el nombre bajo el que se archiva cada respuesta. La pregunta se añade al final del cuestionario.
+         */
+        post: operations["QuestionsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/questions/{id}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Elimina una pregunta que nunca se respondió.
+         * @description Con respuestas detrás devuelve 400: borrarla dejaría esas anamnesis sin enunciado. La salida en ese caso es desactivarla, que la retira del ingreso sin tocar el historial.
+         */
+        post: operations["QuestionsController_remove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/questions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Reescribe la redacción de una pregunta. */
+        patch: operations["QuestionsController_update"];
+        trace?: never;
+    };
+    "/api/prescriptions/medications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Vademécum con las indicaciones sugeridas por fármaco.
+         * @description La dosis sugerida cuelga de la INDICACIÓN y no del medicamento: la isotretinoína no se pauta igual en un acné moderado que en uno conglobata.
+         */
+        get: operations["PrescriptionsController_listMedications"];
+        put?: never;
+        /** Da de alta un fármaco en el almacén. */
+        post: operations["PrescriptionsController_createMedication"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prescriptions/case/{caseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recetas emitidas sobre un caso, de la más reciente a la más antigua. */
+        get: operations["PrescriptionsController_byCase"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prescriptions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Una receta con sus renglones y sus entregas. */
+        get: operations["PrescriptionsController_findOne"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prescriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Emite la receta que cierra la consulta.
+         * @description Queda firmada con un SHA-256 del contenido. NO es una firma electrónica reconocida legalmente: sirve para detectar que un PDF descargado no coincide con lo registrado.
+         */
+        post: operations["PrescriptionsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prescriptions/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** La receta como PDF: membrete, paciente, diagnóstico, prescripción, firma y huella. */
+        get: operations["PrescriptionsController_pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prescriptions/{id}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * PDF de la receta para la pasarela de mensajería, con token firmado.
+         * @description Ruta pública por diseño: la pasarela de WhatsApp (Infobip) descarga el PDF de aquí para
+         *     adjuntarlo, y no tiene sesión. Autoriza el token firmado que emitió `send` para esta receta,
+         *     ligado a quien envió y caduco a los 15 minutos (mismo mecanismo que las imágenes, RNF-02).
+         */
+        get: operations["PrescriptionsController_document"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prescriptions/{id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Hace llegar la receta al paciente.
+         * @description WhatsApp se envía por Infobip cuando hay credenciales: como documento PDF si el API tiene URL pública (`PUBLIC_BASE_URL`), si no como texto, y como plantilla si Meta rechaza el texto. El correo se SIMULA (`simulado = true`) y la pantalla lo declara.
+         */
+        post: operations["PrescriptionsController_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prescriptions/{id}/annul": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Anula una receta.
+         * @description Una receta emitida NUNCA se edita ni se borra: el paciente ya se llevó la suya. Se anula y se emite otra.
+         */
+        post: operations["PrescriptionsController_annul"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prescriptions/medications/all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * El almacén completo, activos y retirados.
+         * @description A diferencia de `GET /prescriptions/medications`, que alimenta el buscador de la receta y solo ofrece los activos, esta ruta muestra también los retirados: es lo que permite reactivar uno.
+         */
+        get: operations["PrescriptionsController_listAll"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prescriptions/medications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edita un fármaco y reemplaza sus indicaciones.
+         * @description Desactivarlo es una lápida, no un borrado: deja de ofrecerse en el buscador pero las recetas que ya lo citan siguen siendo legibles.
+         */
+        patch: operations["PrescriptionsController_updateMedication"];
+        trace?: never;
+    };
+    "/api/prescriptions/medications/seed-defaults": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Carga el vademécum base de acné si está vacío.
+         * @description Idempotente: no toca los fármacos que ya existen. Existe para que una instalación nueva pueda recetar sin capturar el catálogo a mano.
+         */
+        post: operations["PrescriptionsController_seedDefaults"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/signatures/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Indica si el profesional tiene firma registrada. */
+        get: operations["SignaturesController_find"];
+        put?: never;
+        /**
+         * Registra o reemplaza la firma.
+         * @description PNG o JPEG, hasta 512 kB. Se guarda cifrada. NO es una firma electrónica reconocida legalmente: es la rúbrica que se imprime en la receta.
+         */
+        post: operations["SignaturesController_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/signatures/{userId}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Devuelve la imagen de la firma, descifrada, con URL firmada.
+         * @description La imagen, autorizada por una URL firmada y no por la sesión.
+         *
+         *     `@Public()` porque una etiqueta `<img>` no puede adjuntar la cabecera Authorization: con
+         *     `@Roles` el navegador recibía 401 y pintaba una imagen rota. Es el mismo mecanismo con el que
+         *     se sirven las fotografías clínicas — token de vida corta, atado a este profesional.
+         */
+        get: operations["SignaturesController_image"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/signatures/me/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retira la firma registrada. */
+        post: operations["SignaturesController_remove"];
         delete?: never;
         options?: never;
         head?: never;
@@ -257,6 +693,46 @@ export interface paths {
          * @description Los bytes se cifran con AES-256-GCM antes de llegar al almacenamiento, de modo que la garantía de confidencialidad no depende de si el backend es disco local o MinIO (RNF-02).
          */
         post: operations["ImagesController_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/images/{id}/shot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Corrige la toma (vista) de una fotografía ya subida.
+         * @description Para rotular como perfil una foto que se subió como vista general sin volver a subirla. No toca los bytes ni afecta a inferencias o diagnósticos; solo la comprobación de tomas obligatorias lee la etiqueta.
+         */
+        post: operations["ImagesController_relabel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/images/{id}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retira una fotografía subida por error.
+         * @description POST y no DELETE: el borrado duro está prohibido en toda la API y esta operación lleva condiciones propias. Se niega si el modelo ya leyó la imagen o si el caso ya tiene un diagnóstico firmado; en ambos casos la fotografía es el sustento de algo ya registrado.
+         */
+        post: operations["ImagesController_remove"];
         delete?: never;
         options?: never;
         head?: never;
@@ -313,7 +789,68 @@ export interface paths {
         /** Devuelve la última inferencia de un caso (bloqueado en pretest). */
         get: operations["InferenceController_findByCase"];
         put?: never;
+        /**
+         * Analiza el caso completo: encola la inferencia de cada toma obligatoria.
+         * @description Vista general y ambos perfiles, con la última fotografía de cada toma. Idempotente: una toma ya inferida con éxito no se vuelve a encolar, salvo con `force=true`, que encola una lectura nueva de cada toma (p. ej. tras cambiar el modelo servido). 400 si falta alguna toma obligatoria.
+         */
+        post: operations["InferenceController_requestForCase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inference/case/{caseId}/analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Análisis del caso: la inferencia de cada toma y la sugerencia combinada. */
+        get: operations["InferenceController_caseAnalysis"];
+        put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inference/case/{caseId}/selection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Elige la lectura (toma y, opcionalmente, modelo) que vale como sugerencia del caso.
+         * @description Sustituye a la regla automática mientras la inferencia elegida sea la vigente de su imagen. La clase elegida es la que alimenta la comprobación anamnesis↔imagen y la ficha de diagnóstico. Queda auditado con quién, cuándo y por qué.
+         */
+        put: operations["InferenceController_chooseReading"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/inference/case/{caseId}/selection/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retira la lectura elegida: el caso vuelve a la regla automática.
+         * @description No borra nada: la elección queda en el historial con quién y cuándo la retiró (`lecturas_elegidas.retirada_en`).
+         */
+        post: operations["InferenceController_withdrawReading"];
         delete?: never;
         options?: never;
         head?: never;
@@ -538,13 +1075,13 @@ export interface paths {
         };
         /**
          * Bandeja de casos con filtro por modo de estudio (Sección 9.3).
-         * @description Para `dermatologo` y `residente` cada caso incluye `patientName` descifrado, de modo que la bandeja se pueda leer por nombre y no solo por código (RF-TR-03). Para el resto de roles llega en `null`.
+         * @description Para los roles que pueden ver la identidad cada caso incluye `patientName` descifrado, de modo que la bandeja se pueda leer por nombre y no solo por código (RF-TR-03). Para el resto de roles llega en `null`.
          */
         get: operations["CasesController_findAll"];
         put?: never;
         /**
          * Crea un caso clínico bajo la condición experimental actual del usuario.
-         * @description El caso queda sellado con el `study_mode` de quien lo crea y lo conserva de por vida: es lo que permite que las mediciones de pretest y postest sean pareables.
+         * @description El caso queda sellado con el `study_mode` de quien lo crea. **No es la unidad de análisis**: los indicadores y los contrastes emparejan por `review_timings.study_mode` y `diagnoses.study_mode`, de modo que un caso abierto por un técnico (que opera en `produccion`) sigue siendo medible cuando el especialista lo revisa en pretest y en postest.
          */
         post: operations["CasesController_create"];
         delete?: never;
@@ -605,6 +1142,163 @@ export interface paths {
         put?: never;
         /** Cierra el caso una vez diagnosticado. */
         post: operations["CasesController_close"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cases/{id}/request-photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Devuelve el caso al mostrador porque las imágenes no alcanzan.
+         * @description INVALIDA la medición en curso en vez de detenerla: entre la devolución y la reposición pueden pasar días de espera, y contarlos haría de TRM una medida de la logística de la clínica y no del trabajo del especialista (OE1). La fila invalidada se conserva.
+         */
+        post: operations["CasesController_requestPhotos"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cases/{id}/resubmit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * El mostrador repone lo que faltaba y devuelve el caso a la bandeja.
+         * @description No reabre el cronómetro: eso ocurre cuando el especialista abre la ficha otra vez, que es el instante en que empieza a trabajar de verdad.
+         */
+        post: operations["CasesController_resubmit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cases/{id}/refer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deriva el caso a atención presencial.
+         * @description Estado FINAL que no es un éxito. La medición se cierra normalmente —el especialista sí dedicó ese tiempo— pero el caso no produce un diagnóstico comparable, de modo que queda fuera de TPD y no cuenta como caso resuelto para TCAD.
+         */
+        post: operations["CasesController_refer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/capture-sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Abre una sesión de captura y devuelve el token del QR.
+         * @description El token en claro se devuelve UNA sola vez; la base guarda solo su SHA-256. Caduca a los 15 minutos, admite un número acotado de fotografías y se revoca sola al abrir la ficha del caso, porque a partir de ahí corre el cronómetro que mide OE1.
+         */
+        post: operations["CaptureController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cases/{caseId}/capture-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sesión de captura viva del caso, si la hay.
+         * @description Permite al escritorio recuperar el estado tras recargar. No devuelve el token: si se perdió, hay que abrir una sesión nueva.
+         */
+        get: operations["CaptureController_active"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/capture-sessions/{id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoca la sesión de captura. */
+        post: operations["CaptureController_revoke"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/capture/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Contexto de la sesión para la página móvil.
+         * @description Devuelve el CÓDIGO del caso y la lista de tomas pendientes. Nunca el nombre del paciente: la ruta es pública y quien tuviera el enlace obtendría de otro modo una identidad (RF-TR-03). Un token caducado, revocado o inexistente responde igual, para no revelar qué casos existen.
+         */
+        get: operations["CaptureController_context"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/capture/{token}/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sube una fotografía desde el teléfono.
+         * @description El formato se determina leyendo los bytes del archivo, no la cabecera que declara el cliente: aquí no hay sesión que respalde esa declaración. La imagen se cifra en reposo igual que cualquier otra (RNF-02) y se atribuye a quien abrió la sesión, de modo que la traza de auditoría nunca se queda sin responsable.
+         */
+        post: operations["CaptureController_upload"];
         delete?: never;
         options?: never;
         head?: never;
@@ -951,6 +1645,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/audit/logs/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Acciones que aparecen en la traza, con su recuento.
+         * @description Se derivan de las propias filas y no de una constante: el catálogo de acciones no está declarado en ningún sitio —cada una es un literal en su punto de llamada—, así que una lista escrita a mano quedaría obsoleta al añadir el primer endpoint, y el filtro ocultaría justo los eventos que nadie sabría buscar.
+         */
+        get: operations["AuditApiController_logActions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/audit/logs": {
         parameters: {
             query?: never;
@@ -1011,13 +1725,13 @@ export interface components {
             email: string;
             fullName: string;
             /** @enum {string} */
-            role: "dermatologo" | "residente" | "admin" | "evaluador_estadistico";
-            /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            role: "admin" | "dermatologo" | "tecnico";
             specialty: string | null;
+            /** @description Teléfono de contacto, descifrado. Cada lectura del listado queda auditada. */
+            phone: string | null;
             active: boolean;
-            /** @description Valor de la variable independiente implícito en el modo (0 o 1). */
-            iia: number;
+            /** @description Profesional inventado por seed:study para poblar el censo de demostración. No es personal del centro y queda fuera del recuento de participantes del estudio. */
+            isSynthetic: boolean;
             consentAcceptedAt: string | null;
             createdAt: string;
         };
@@ -1029,25 +1743,34 @@ export interface components {
             /** @example Dra. Ana Torres */
             fullName: string;
             /** @enum {string} */
-            role: "dermatologo" | "residente" | "admin" | "evaluador_estadistico";
-            /**
-             * @default produccion
-             * @enum {string}
-             */
-            studyMode: "pretest" | "postest" | "produccion";
+            role: "admin" | "dermatologo" | "tecnico";
             /** @example Dermatología clínica */
             specialty?: string;
+            /**
+             * @description Teléfono de contacto del profesional. Se guarda cifrado, como el del paciente: el número de quien atiende identifica a una persona igual que el de quien es atendido.
+             * @example +51987654321
+             */
+            phone?: string;
+        };
+        ChangePasswordDto: {
+            /** @description La contraseña vigente, para confirmar que es su propia cuenta. */
+            currentPassword: string;
+            newPassword: string;
         };
         UpdateUserDto: {
             fullName?: string;
+            /** @example dermatologo@centro.pe */
+            email?: string;
             /** @enum {string} */
-            role?: "dermatologo" | "residente" | "admin" | "evaluador_estadistico";
+            role?: "admin" | "dermatologo" | "tecnico";
             active?: boolean;
             specialty?: string;
+            /** @example +51987654321 */
+            phone?: string;
         };
-        SetStudyModeDto: {
-            /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+        TemporaryPasswordDto: {
+            /** @description Se muestra una sola vez. No se almacena en claro ni se audita. */
+            password: string;
         };
         LoginDto: {
             /** @example admin@unt.edu.pe */
@@ -1060,11 +1783,7 @@ export interface components {
             email: string;
             fullName: string;
             /** @enum {string} */
-            role: "dermatologo" | "residente" | "admin" | "evaluador_estadistico";
-            /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
-            /** @description Variable independiente: 0 sin IA, 1 con IA. */
-            iia: number;
+            role: "admin" | "dermatologo" | "tecnico";
         };
         LoginResponseDto: {
             accessToken: string;
@@ -1080,7 +1799,7 @@ export interface components {
             id: string;
             /** @description Identificador anonimizado, p. ej. PAC-2026-0001. */
             patientCode: string;
-            /** @description Nombre descifrado. Solo se rellena para `dermatologo` y `residente`; para el resto de roles llega en `null`, de modo que la anonimización de RF-TR-03 se mantiene. */
+            /** @description Nombre descifrado. Solo se rellena para los roles que pueden ver la identidad; para el resto de roles llega en `null`, de modo que la anonimización de RF-TR-03 se mantiene. */
             fullName: string | null;
             birthDate: string | null;
             ageYears: number | null;
@@ -1114,6 +1833,13 @@ export interface components {
              * @enum {string}
              */
             fitzpatrickPhototype?: "I" | "II" | "III" | "IV" | "V" | "VI";
+            /**
+             * @description Teléfono del paciente. Es por donde se le envía la receta, así que pedirlo en el ingreso evita tener que teclearlo —y equivocarse— en cada envío. Se almacena cifrado.
+             * @example +51987654321
+             */
+            phone?: string;
+            /** @description Correo del paciente, canal alterno. También cifrado. */
+            email?: string;
             /** @description Consentimiento informado del paciente (RNF-07). */
             consentAccepted: boolean;
             /** @default 1.0 */
@@ -1141,7 +1867,7 @@ export interface components {
         HistoryDiagnosisDto: {
             id: string;
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
             /** @enum {string} */
             igaClass: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo";
             gagsScore: number | null;
@@ -1151,12 +1877,28 @@ export interface components {
         };
         HistoryTimingDto: {
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
             /** @description Instante de apertura de la ficha (t₀). */
             t0: string;
             /** @description TRᵢ en minutos. */
             reviewMinutes: number | null;
             valid: boolean;
+        };
+        AiAssessmentDto: {
+            /** @description La lectura del caso en prosa, como la dictaría un dermatólogo. */
+            summary: string;
+            /** @description Lesiones elementales distinguidas. */
+            lesionTypes: string[];
+            /** @description Zonas faciales comprometidas. */
+            affectedZones: string[];
+            /** @description Por qué esa clase IGA y no la contigua. */
+            severityRationale: string;
+            /** @description Otros cuadros que podrían explicar lo observado. */
+            differentials: string[];
+            /** @description Aspectos de manejo a valorar. Nunca una prescripción ni una dosis. */
+            considerations: string[];
+            /** @description Lo que la anamnesis cambia: embarazo, medicación, alergias, cicatrices. */
+            anamnesisFlags: string[];
         };
         HistoryInferenceDto: {
             /** @enum {string|null} */
@@ -1166,6 +1908,8 @@ export interface components {
             /** @description `stub` indica que no proviene de una CNN entrenada. */
             modelBackend: string;
             createdAt: string;
+            /** @description La lectura razonada de esa visita: por qué esa clase, qué lesiones distinguió, qué zonas, qué diferenciales y qué cambia la anamnesis. Se guardaba desde el principio y no se mostraba en ningún sitio salvo la ficha del caso abierto; en una consulta de control lo que se necesita es justamente poder releer el razonamiento de la visita anterior. Nula cuando el backend solo mira píxeles: una CNN emite cinco números y no los funda en prosa. */
+            assessment: components["schemas"]["AiAssessmentDto"] | null;
         };
         CaseImageDto: {
             id: string;
@@ -1179,20 +1923,34 @@ export interface components {
             encrypted: boolean;
             /** @description True para superposiciones Grad-CAM. */
             isHeatmap: boolean;
+            /**
+             * @description Toma del protocolo fotográfico. Null en las imágenes anteriores al protocolo y en las sintéticas del seeder, que no lo siguieron.
+             * @enum {string|null}
+             */
+            shotKey: "general" | "acercamiento" | "borde" | "perfil_derecho" | "perfil_izquierdo" | "pecho" | "espalda" | "otra" | null;
             createdAt: string;
             /** @description URL firmada con TTL de 15 minutos (RNF-02). */
             url: string;
+        };
+        HistoryAnamnesisDto: {
+            complete: boolean;
+            /** @description Versión del catálogo con que se respondió (RNF-03). */
+            version: string;
+            /** @description Preguntas con respuesta. */
+            answeredCount: number;
+            /** @description Embarazo actual declarado. Los retinoides orales son teratógenos, de modo que la ficha lo muestra de forma permanente. Es una etiqueta para el profesional, no una decisión automatizada (RNF-06). */
+            pregnancyFlag: boolean;
         };
         HistoryEntryDto: {
             caseId: string;
             caseCode: string;
             /** @enum {string} */
-            status: "draft" | "in_review" | "ai_processed" | "diagnosed" | "closed";
+            status: "borrador" | "en_revision" | "procesado_ia" | "solicitar_fotos" | "derivar_presencial" | "diagnosticado" | "cerrado";
             /**
              * @description Condición en que se registró el caso.
              * @enum {string}
              */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
             /** @enum {string|null} */
             groundTruthIga: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
             isSynthetic: boolean;
@@ -1208,6 +1966,8 @@ export interface components {
             /** @description Siempre null cuando el solicitante opera en pretest (RF-TR-01). */
             inference: components["schemas"]["HistoryInferenceDto"] | null;
             images: components["schemas"]["CaseImageDto"][];
+            /** @description Null cuando la visita no registró anamnesis. */
+            anamnesis: components["schemas"]["HistoryAnamnesisDto"] | null;
         };
         PatientHistoryDto: {
             patient: components["schemas"]["PatientResponseDto"];
@@ -1218,12 +1978,43 @@ export interface components {
         PatientIdentityDto: {
             fullName: string | null;
             documentId: string | null;
+            /** @description Teléfono por el que se le hace llegar la receta. */
+            phone: string | null;
+            email: string | null;
+        };
+        WithdrawPatientDto: {
+            /** @description Motivo declarado. No escriba datos personales. */
+            notes?: string;
+        };
+        UpdatePatientDto: {
+            /** @description Se re-cifra con AES-256-GCM (RF-TR-03). */
+            fullName?: string;
+            /** @description Se re-cifra. Solo quien diagnostica puede tocarlo. */
+            documentId?: string;
+            /** @example 1998-04-11 */
+            birthDate?: string;
+            /** @enum {string} */
+            sex?: "femenino" | "masculino" | "otro";
+            /**
+             * @description Teléfono del paciente, por donde se le hace llegar la receta. Se re-cifra (RF-TR-03).
+             * @example +51987654321
+             */
+            phone?: string;
+            /** @description Correo del paciente. También se re-cifra. */
+            email?: string;
+            /** @enum {string} */
+            fitzpatrickPhototype?: "I" | "II" | "III" | "IV" | "V" | "VI";
+        };
+        ReinstatePatientDto: {
+            /** @description Por qué se reincorpora. Queda en el historial de consentimientos. */
+            notes: string;
         };
         Consent: {
             id: string;
-            subjectType: Record<string, never>;
-            /** @description Patient id or user id, depending on `subjectType`. */
-            subjectId: string;
+            /** @description Set when the subject is a patient; mutually exclusive with `userId`. */
+            patientId: string | null;
+            /** @description Set when the subject is a member of staff; mutually exclusive with `patientId`. */
+            userId: string | null;
             version: string;
             accepted: boolean;
             /** Format: date-time */
@@ -1233,12 +2024,279 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        AnamnesisAnswerDto: {
+            /** @description Valor de la respuesta. Su tipo lo fija la pregunta en el catálogo. */
+            value: (boolean | string | number | string[]) | null;
+            /** @description Texto libre complementario. No se cifra: no escriba nombres ni documentos. */
+            detail?: string | null;
+        };
+        AnamnesisResponseDto: {
+            caseId: string;
+            /** @description Versión del catálogo contra la que se respondió (RNF-03). */
+            version: string;
+            answers: {
+                [key: string]: components["schemas"]["AnamnesisAnswerDto"];
+            };
+            complete: boolean;
+            /** @description Preguntas respondidas de las aplicables a este paciente. */
+            answeredCount: number;
+            /** @description Preguntas aplicables según sexo y edad. */
+            applicableCount: number;
+            /** @description Embarazo actual declarado. Los retinoides orales son teratógenos, así que la ficha lo muestra de forma permanente. Es una etiqueta para el profesional, no una decisión automatizada (RNF-06). */
+            pregnancyFlag: boolean;
+            prefilledFromCaseId: string | null;
+            completedBy: string | null;
+            updatedAt: string;
+        };
+        SaveAnamnesisDto: {
+            /** @description Mapa clave → respuesta. Claves válidas: peso_kg, enfermedad_cronica, medicacion_actual, alergia_medicamentos, tiempo_evolucion, episodio_previo, evaluacion_previa, tratamientos_previos, sintomas, zona_extrafacial, productos_acne, fotoproteccion, suplementos, antecedente_familiar, maquillaje, menstruacion_regular, empeora_premenstrual, embarazo_menopausia, anticonceptivo, caida_cabello, vello_inusual. */
+            answers: {
+                [key: string]: components["schemas"]["AnamnesisAnswerDto"];
+            };
+            /** @description Marca la anamnesis como terminada. Es informativo: nunca condiciona crear ni revisar el caso. */
+            complete?: boolean;
+            /** @description Caso del que se precargaron las respuestas, si se usó una visita anterior. */
+            prefilledFromCaseId?: string | null;
+        };
+        AnamnesisPrefillDto: {
+            /** @description Caso del que proviene. */
+            caseId: string;
+            caseCode: string;
+            /** @description Fecha de aquella visita. */
+            visitedAt: string;
+            version: string;
+            answers: {
+                [key: string]: components["schemas"]["AnamnesisAnswerDto"];
+            };
+        };
+        QuestionDto: {
+            id: string;
+            /** @description Clave bajo la que se archivan las respuestas. */
+            key: string;
+            number: number;
+            /** @enum {string} */
+            section: "contexto" | "lesion" | "acne" | "hormonal";
+            sectionLabel: string;
+            text: string;
+            /** @enum {string} */
+            type: "booleano" | "texto" | "numero" | "opcion_unica" | "opcion_multiple";
+            /** @enum {string} */
+            scope: "siempre" | "mujer_adulta";
+            unit: string | null;
+            required: boolean;
+            detailPrompt: string | null;
+            hint: string | null;
+            options: string[] | null;
+            active: boolean;
+            /** @description Cuántas anamnesis la han respondido. */
+            answerCount: number;
+            /** @description true cuando ya tiene respuestas: la clave, el tipo, el ámbito y las opciones quedan fijos porque los valores guardados se interpretan según ellos. La redacción sigue siendo editable. */
+            locked: boolean;
+            updatedAt: string;
+        };
+        CreateQuestionDto: {
+            /** @description Clave de archivo. Se normaliza a minúsculas sin tildes ni espacios: «Peso Actual» queda como «peso_actual». Es única y no se puede reutilizar. */
+            key: string;
+            /** @enum {string} */
+            section: "contexto" | "lesion" | "acne" | "hormonal";
+            /** @description La redacción que ve el paciente. */
+            text: string;
+            /** @enum {string} */
+            type: "booleano" | "texto" | "numero" | "opcion_unica" | "opcion_multiple";
+            /**
+             * @description «mujer_adulta» limita la pregunta al bloque hormonal (mujeres desde los 18).
+             * @enum {string}
+             */
+            scope: "siempre" | "mujer_adulta";
+            /** @description Obligatorias solo para elección única o múltiple. */
+            options?: string[];
+            unit?: string;
+            required?: boolean;
+            detailPrompt?: string;
+            hint?: string;
+            version?: string;
+            active?: boolean;
+        };
+        UpdateQuestionDto: {
+            key?: string;
+            /** @enum {string} */
+            section?: "contexto" | "lesion" | "acne" | "hormonal";
+            text?: string;
+            /** @enum {string} */
+            type?: "booleano" | "texto" | "numero" | "opcion_unica" | "opcion_multiple";
+            /** @enum {string} */
+            scope?: "siempre" | "mujer_adulta";
+            options?: string[];
+            unit?: string;
+            hint?: string;
+            detailPrompt?: string;
+            required?: boolean;
+            active?: boolean;
+        };
+        MedicationIndicationDto: {
+            id: string;
+            indication: string;
+            suggestedDose: string | null;
+            suggestedFrequency: string | null;
+            suggestedDuration: string | null;
+        };
+        MedicationDto: {
+            id: string;
+            name: string;
+            activeIngredient: string | null;
+            description: string | null;
+            active: boolean;
+            indications: components["schemas"]["MedicationIndicationDto"][];
+        };
+        PrescriptionItemDto: {
+            id: string;
+            medicationId: string | null;
+            name: string;
+            dose: string;
+            frequency: string;
+            duration: string;
+            quantity: number;
+            indication: string | null;
+            order: number;
+        };
+        PrescriptionDeliveryDto: {
+            id: string;
+            /** @enum {string} */
+            channel: "whatsapp" | "correo" | "descarga";
+            channelLabel: string;
+            /** @description Destino enmascarado salvo para quien puede ver la identidad del paciente (RF-TR-03). */
+            destination: string;
+            /** @description true cuando el prototipo registró el envío sin ejecutarlo. */
+            simulated: boolean;
+            successful: boolean;
+            detail: string | null;
+            sentAt: string;
+        };
+        PrescriptionDto: {
+            id: string;
+            prescriptionCode: string;
+            caseId: string;
+            caseCode: string;
+            diagnosisId: string | null;
+            patientId: string;
+            patientCode: string;
+            /** @description Nombre descifrado; nulo para quien no puede ver la identidad (RF-TR-03). */
+            patientName: string | null;
+            physicianId: string;
+            physicianName: string;
+            instructions: string | null;
+            /** @enum {string} */
+            status: "generada" | "enviada" | "anulada";
+            statusLabel: string;
+            digitalSignature: string | null;
+            signedAt: string | null;
+            isSynthetic: boolean;
+            createdAt: string;
+            items: components["schemas"]["PrescriptionItemDto"][];
+            deliveries: components["schemas"]["PrescriptionDeliveryDto"][];
+        };
+        PrescriptionItemInputDto: {
+            /** @description Trazabilidad al vademécum. Nulo cuando el especialista escribe el fármaco a mano. */
+            medicationId?: string | null;
+            name: string;
+            dose: string;
+            frequency: string;
+            duration: string;
+            quantity: number;
+            indication?: string | null;
+        };
+        CreatePrescriptionDto: {
+            /** @description Caso al que pertenece la receta. */
+            caseId: string;
+            /** @description Diagnóstico que la fundamenta. Si se omite, la API toma el más reciente del caso en la condición del solicitante: una receta sin el juicio que la motiva no es auditable. */
+            diagnosisId?: string | null;
+            /** @description Indicaciones generales del tratamiento. */
+            instructions?: string | null;
+            /** @description Al menos uno, como máximo 12. */
+            items: components["schemas"]["PrescriptionItemInputDto"][];
+        };
+        SendPrescriptionDto: {
+            /** @enum {string} */
+            channel: "whatsapp" | "correo" | "descarga";
+            /** @description Teléfono o correo. Si se omite, la API usa el que tenga registrado el paciente. No se guarda en el paciente: un envío puntual a otro número no cambia su ficha. */
+            destination?: string | null;
+        };
+        MedicationIndicationInputDto: {
+            indication: string;
+            suggestedDose?: string | null;
+            suggestedFrequency?: string | null;
+            suggestedDuration?: string | null;
+        };
+        SaveMedicationDto: {
+            name: string;
+            activeIngredient?: string | null;
+            description?: string | null;
+            /** @description Una lápida, no un borrado: un fármaco retirado deja de ofrecerse pero las recetas que ya lo citan siguen siendo legibles. */
+            active?: boolean;
+            /** @description Reemplaza la lista completa. */
+            indications?: components["schemas"]["MedicationIndicationInputDto"][];
+        };
+        SignatureDto: {
+            /** @description Si el profesional tiene una rúbrica registrada. */
+            hasSignature: boolean;
+            updatedAt: string | null;
+            /** @description URL firmada de la imagen, con la misma vida corta que las fotografías clínicas. Va firmada porque una etiqueta <img> no puede adjuntar la cabecera Authorization: una ruta protegida por rol devolvería 401 y el navegador pintaría una imagen rota. */
+            imageUrl: string | null;
+        };
+        UploadedImageDto: {
+            id: string;
+            caseId: string;
+            mimeType: string;
+            width: number | null;
+            height: number | null;
+            sizeBytes: number;
+            /** @description SHA-256 del plaintext, para verificar integridad tras descifrar. */
+            sha256: string;
+            encrypted: boolean;
+            /** @description True para superposiciones Grad-CAM. */
+            isHeatmap: boolean;
+            /**
+             * @description Toma del protocolo fotográfico. Null en las imágenes anteriores al protocolo y en las sintéticas del seeder, que no lo siguieron.
+             * @enum {string|null}
+             */
+            shotKey: "general" | "acercamiento" | "borde" | "perfil_derecho" | "perfil_izquierdo" | "pecho" | "espalda" | "otra" | null;
+            createdAt: string;
+            /** @description URL firmada con TTL de 15 minutos (RNF-02). */
+            url: string;
+            /** @description Avisos de calidad de la fotografía admitida. No bloquean la subida. */
+            warnings: string[];
+        };
+        RelabelImageDto: {
+            /**
+             * @description Toma del protocolo fotográfico. Cambiarla no toca los bytes ni el cifrado: solo corrige qué vista es, que es lo que las tomas obligatorias comprueban.
+             * @enum {string}
+             */
+            shotKey: "general" | "acercamiento" | "borde" | "perfil_derecho" | "perfil_izquierdo" | "pecho" | "espalda" | "otra";
+        };
+        AiInferenceMemberDto: {
+            /** @description Etiqueta del miembro, p. ej. yolov8s-cls. */
+            tag: string;
+            modelName: string;
+            modelVersion: string;
+            weightsChecksum: string;
+            /** @description Peso en la votación: F1 macro en el test congelado. */
+            weight: number;
+            /** @enum {string} */
+            igaClass: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo";
+            confidence: number;
+            classProbs: {
+                [key: string]: number;
+            };
+            /** @description Grad-CAM de este modelo. */
+            heatmapImageId: string | null;
+            latencyMs: number;
+        };
         AiInferenceDto: {
             id: string;
             caseId: string;
             imageId: string;
             /** @enum {string} */
-            status: "pending" | "running" | "succeeded" | "failed";
+            status: "pendiente" | "ejecutando" | "exitoso" | "fallido";
             /** @enum {string|null} */
             igaClass: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
             confidence: number | null;
@@ -1247,7 +2305,7 @@ export interface components {
                 [key: string]: number;
             } | null;
             /** @enum {string|null} */
-            gagsGrade: "none" | "mild" | "moderate" | "severe" | "very_severe" | null;
+            gagsGrade: "sin_acne" | "leve" | "moderado" | "severo" | "muy_severo" | null;
             gagsScore: number | null;
             heatmapImageId: string | null;
             latencyMs: number | null;
@@ -1256,8 +2314,89 @@ export interface components {
             modelBackend: string;
             weightsChecksum: string | null;
             seed: number;
+            /** @description Lectura clínica razonada del modelo. Nula cuando el backend solo mira píxeles: una CNN emite cinco números y no puede fundamentarlos en prosa. */
+            assessment: components["schemas"]["AiAssessmentDto"] | null;
+            /**
+             * @description Acuerdo entre los modelos del ensemble sobre la clase: unanime, mayoria o discrepancia. Nulo cuando sirvió un solo modelo.
+             * @enum {string|null}
+             */
+            agreement: "unanime" | "mayoria" | "discrepancia" | null;
+            /** @description Lectura de cada modelo cuando el motor sirve un ensemble. `igaClass`/`classProbs` de la cabecera es la lectura íntegra del modelo más seguro sobre esa toma (empate → mayor F1). */
+            members: components["schemas"]["AiInferenceMemberDto"][];
             errorMessage: string | null;
             createdAt: string;
+        };
+        CaseReadingSelectionDto: {
+            inferenceId: string;
+            imageId: string;
+            /** @enum {string|null} */
+            shotKey: "general" | "acercamiento" | "borde" | "perfil_derecho" | "perfil_izquierdo" | "pecho" | "espalda" | "otra" | null;
+            /** @description Modelo elegido dentro de la toma; nulo = la lectura del ensemble de esa toma. */
+            memberTag: string | null;
+            /** @enum {string|null} */
+            igaClass: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
+            confidence: number | null;
+            reason: string | null;
+            chosenByName: string | null;
+            chosenAt: string;
+            /** @description False si la inferencia elegida ya no es la vigente de su imagen (caso reanalizado). */
+            active: boolean;
+        };
+        CaseAnalysisViewDto: {
+            imageId: string;
+            /** @enum {string|null} */
+            shotKey: "general" | "acercamiento" | "borde" | "perfil_derecho" | "perfil_izquierdo" | "pecho" | "espalda" | "otra" | null;
+            /** @description La inferencia completa de esta toma. */
+            inference: components["schemas"]["AiInferenceDto"];
+        };
+        CaseAnalysisDto: {
+            /**
+             * @description Clase sugerida para el caso: la mayoría de las tomas analizadas o, si todas difieren, la toma en la que el ensemble estuvo más seguro (ver `rule`).
+             * @enum {string|null}
+             */
+            igaClass: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
+            confidence: number | null;
+            classProbs: {
+                [key: string]: number;
+            } | null;
+            /**
+             * @description Acuerdo entre las tomas sobre la clase sugerida.
+             * @enum {string|null}
+             */
+            agreement: "unanime" | "mayoria" | "discrepancia" | null;
+            /**
+             * @description Regla que produjo la sugerencia: mayoría de tomas; la toma en la que el ensemble estuvo más seguro cuando todas difieren; o la lectura elegida por el técnico o el dermatólogo (`selection`).
+             * @enum {string|null}
+             */
+            rule: "mayoria" | "toma_mas_confiable" | "seleccion_manual" | null;
+            /** @description Lectura elegida a mano para el caso, si la hay. Cuando `active` es true, `igaClass`, `confidence` y `classProbs` son los de esa lectura y `rule` es `seleccion_manual`. */
+            selection: components["schemas"]["CaseReadingSelectionDto"] | null;
+            /** @description La regla en una frase, para mostrar. */
+            ruleDescription: string;
+            /** @description imageId de las tomas que decidieron la sugerencia. */
+            decidedBy: string[];
+            /** @description Grado mínimo y máximo entre las tomas analizadas. */
+            range: {
+                min?: string;
+                max?: string;
+            } | null;
+            /** @description Tomas con inferencia terminada con éxito. */
+            completed: number;
+            /** @description Tomas con inferencia pendiente o en ejecución. */
+            pending: number;
+            /** @description Tomas cuya inferencia falló. */
+            failed: number;
+            views: components["schemas"]["CaseAnalysisViewDto"][];
+            /** @description Lectura estructurada del caso, escrita por el sistema a partir de las tomas, los modelos, el acuerdo, la escala IGA y la anamnesis. No es prosa del modelo: la CNN no la produce. */
+            reading: components["schemas"]["AiAssessmentDto"] | null;
+        };
+        ChooseReadingDto: {
+            /** @description Inferencia (toma) elegida; debe ser la vigente de su imagen. */
+            inferenceId: string;
+            /** @description Etiqueta del modelo elegido dentro de la toma; omitir o nulo = lectura del ensemble. */
+            memberTag?: string | null;
+            /** @description Por qué esa lectura (queda auditado). */
+            reason?: string | null;
         };
         StudyDesignDto: {
             design: string;
@@ -1265,7 +2404,7 @@ export interface components {
             schema: string;
             sampleSize: number;
             /** @enum {string} */
-            currentStudyMode: "pretest" | "postest" | "produccion";
+            currentStudyMode: "pretest" | "postest";
             currentStudyModeLabel: string;
             /** @description Variable independiente: 0 sin IA, 1 con IA. */
             iia: number;
@@ -1290,7 +2429,7 @@ export interface components {
             patientCode: string;
             professional: string;
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
             /** @description Hora de inicio de la revisión (t₀). */
             startTime: string;
             /** @description t₁. */
@@ -1311,7 +2450,7 @@ export interface components {
             userId: string;
             userFullName: string;
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
             /** @enum {string} */
             shift: "manana" | "tarde" | "noche";
             startedAt: string;
@@ -1345,7 +2484,7 @@ export interface components {
              */
             shift: "manana" | "tarde" | "noche";
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
             /** @description NCR — número de casos revisados, contado por el sistema. */
             casesReviewed: number;
             /** @description TJ — duración de la jornada en horas, declarada por el profesional. */
@@ -1361,6 +2500,18 @@ export interface components {
              */
             igaClass: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo";
             gagsScore?: number;
+            /** @description El diagnóstico redactado, aparte de la clase IGA. La clase sigue siendo obligatoria: TPD la compara contra el patrón de referencia y un texto libre no es comparable con nada. */
+            definitiveDiagnosis?: string;
+            /** @description Obligatorio cuando la ficha muestra una incongruencia entre la anamnesis y la imagen: el especialista declara que revisó la fotografía y que corresponde al paciente y a la zona afectada. Sin esto, el diagnóstico se rechaza mientras la incongruencia exista. */
+            mismatchAcknowledged?: boolean;
+            /** @description Por qué se mantiene el diagnóstico pese a la incongruencia. Queda en la auditoría. */
+            mismatchReason?: string;
+            /** @description Código CIE-10 del catálogo servido en `/meta/catalogs`. */
+            icd10Code?: string;
+            /** @description Lo que se le dice al paciente; viaja impreso en la receta. */
+            patientNotes?: string;
+            /** @description Texto que el paciente NUNCA ve. Sin cifrar: no escriba aquí nombres ni documentos (Ley N.º 29733). */
+            internalNotes?: string;
             /** @description Solo aplica en postest: si el profesional mantuvo la sugerencia de la IA. Si se omite, el sistema lo deduce comparando la clase emitida con la predicha. */
             aiSuggestionAccepted?: boolean;
             notes?: string;
@@ -1372,7 +2523,7 @@ export interface components {
             userId: string;
             userFullName: string;
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
             /** @enum {string} */
             igaClass: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo";
             gagsScore: number | null;
@@ -1383,6 +2534,10 @@ export interface components {
             agreement: "correcto" | "incorrecto" | null;
             aiSuggestionAccepted: boolean | null;
             aiInferenceId: string | null;
+            definitiveDiagnosis: string | null;
+            icd10Code: string | null;
+            patientNotes: string | null;
+            internalNotes: string | null;
             notes: string | null;
             createdAt: string;
             /** @description TRᵢ del caso en minutos, congelado al enviar el diagnóstico (OE1). */
@@ -1393,7 +2548,7 @@ export interface components {
             date: string;
             caseCode: string;
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
             /**
              * @description Diagnóstico de la IA.
              * @enum {string|null}
@@ -1428,14 +2583,16 @@ export interface components {
             caseCode: string;
             patientId: string;
             patientCode: string;
-            /** @description Nombre del paciente, descifrado solo para `dermatologo` y `residente` (RF-TR-03). Para el resto de roles llega en `null`; los anexos, exportaciones y reportes usan siempre el código, nunca el nombre. */
+            /** @description Nombre del paciente, descifrado solo para los roles que pueden ver la identidad (RF-TR-03). Para el resto de roles llega en `null`; los anexos, exportaciones y reportes usan siempre el código, nunca el nombre. */
             patientName: string | null;
             assignedUserId: string | null;
             assignedUserName: string | null;
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
+            /** @description Por qué el especialista devolvió el caso al mostrador o lo derivó a presencial. Se muestra a quien recibe el caso: devolverlo sin decir qué falta garantiza una segunda devolución. */
+            returnReason: string | null;
             /** @enum {string} */
-            status: "draft" | "in_review" | "ai_processed" | "diagnosed" | "closed";
+            status: "borrador" | "en_revision" | "procesado_ia" | "solicitar_fotos" | "derivar_presencial" | "diagnosticado" | "cerrado";
             /** @enum {string|null} */
             groundTruthIga: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
             isSynthetic: boolean;
@@ -1473,14 +2630,16 @@ export interface components {
             caseCode: string;
             patientId: string;
             patientCode: string;
-            /** @description Nombre del paciente, descifrado solo para `dermatologo` y `residente` (RF-TR-03). Para el resto de roles llega en `null`; los anexos, exportaciones y reportes usan siempre el código, nunca el nombre. */
+            /** @description Nombre del paciente, descifrado solo para los roles que pueden ver la identidad (RF-TR-03). Para el resto de roles llega en `null`; los anexos, exportaciones y reportes usan siempre el código, nunca el nombre. */
             patientName: string | null;
             assignedUserId: string | null;
             assignedUserName: string | null;
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
+            /** @description Por qué el especialista devolvió el caso al mostrador o lo derivó a presencial. Se muestra a quien recibe el caso: devolverlo sin decir qué falta garantiza una segunda devolución. */
+            returnReason: string | null;
             /** @enum {string} */
-            status: "draft" | "in_review" | "ai_processed" | "diagnosed" | "closed";
+            status: "borrador" | "en_revision" | "procesado_ia" | "solicitar_fotos" | "derivar_presencial" | "diagnosticado" | "cerrado";
             /** @enum {string|null} */
             groundTruthIga: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
             isSynthetic: boolean;
@@ -1490,16 +2649,84 @@ export interface components {
             images: components["schemas"]["CaseImageDto"][];
             /** @description Sugerencia de la CNN. SIEMPRE null cuando el solicitante opera en modo pretest (RF-TR-01). */
             inference: components["schemas"]["AiInferenceDto"] | null;
+            /** @description Análisis del caso completo (una inferencia por toma obligatoria, combinadas). Null cuando el solicitante no puede ver la IA o no hay ninguna inferencia. */
+            caseAnalysis: components["schemas"]["CaseAnalysisDto"] | null;
             diagnoses: components["schemas"]["DiagnosisDto"][];
             timing: components["schemas"]["CaseTimingDto"] | null;
             /** @description Si el portal debe mostrar el módulo de IA para este usuario y este caso. */
             aiVisible: boolean;
+            /** @description Tomas obligatorias del protocolo fotográfico que el caso aún no tiene. Mientras no esté vacío, la inferencia y el diagnóstico se rechazan con 400. Igual para todos los roles. */
+            missingShots: ("general" | "acercamiento" | "borde" | "perfil_derecho" | "perfil_izquierdo" | "pecho" | "espalda" | "otra")[];
+            /** @description Avisos de incongruencia entre la anamnesis y la sugerencia de IA (el modelo ve piel limpia y el cuestionario describe lesiones activas). Vacío cuando no hay sugerencia visible. Informativo: la decisión es del profesional (RNF-06). */
+            anamnesisMismatch: string[];
+        };
+        CaseReturnDto: {
+            /** @description Qué falta o por qué requiere atención presencial. Obligatorio: devolver un caso sin decirlo obliga al mostrador a adivinar y garantiza una segunda devolución. */
+            reason: string;
         };
         UpdateCaseDto: {
             /** @enum {string} */
             groundTruthIga?: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo";
             assignedUserId?: string;
             notes?: string;
+        };
+        CreateCaptureSessionDto: {
+            /** @description Caso al que se atarán las fotografías. */
+            caseId: string;
+            /** @description Tope de fotografías de la sesión. La ruta de subida es pública, así que este número —y no la autenticación— es lo que acota el alcance de un enlace filtrado. */
+            maxUploads?: number;
+        };
+        CaptureSessionCreatedDto: {
+            id: string;
+            caseId: string;
+            caseCode: string;
+            /** @description Token en claro. Se devuelve UNA sola vez: la base guarda solo su SHA-256. Es lo que se codifica en el QR. */
+            token: string;
+            expiresAt: string;
+            maxUploads: number;
+        };
+        CaptureSessionStatusDto: {
+            id: string;
+            caseId: string;
+            expiresAt: string;
+            remainingSeconds: number;
+            uploadCount: number;
+            maxUploads: number;
+            revokedAt: string | null;
+            active: boolean;
+        };
+        ShotDefinitionDto: {
+            /** @enum {string} */
+            key: "general" | "acercamiento" | "borde" | "perfil_derecho" | "perfil_izquierdo" | "pecho" | "espalda" | "otra";
+            label: string;
+            instruction: string;
+            required: boolean;
+            /** @description Cuántas fotografías de esta toma ya se subieron. */
+            uploaded: number;
+        };
+        CaptureSessionContextDto: {
+            caseCode: string;
+            expiresAt: string;
+            remainingSeconds: number;
+            uploadCount: number;
+            maxUploads: number;
+            shots: components["schemas"]["ShotDefinitionDto"][];
+            /** @description Aviso regulatorio que la página móvil debe mostrar (RNF-06). */
+            disclaimer: string;
+        };
+        CaptureUploadedImageDto: {
+            id: string;
+            /** @enum {string|null} */
+            shotKey: "general" | "acercamiento" | "borde" | "perfil_derecho" | "perfil_izquierdo" | "pecho" | "espalda" | "otra" | null;
+            createdAt: string;
+        };
+        CaptureUploadResultDto: {
+            /** @description Sin URL firmada: el móvil sube fotografías, nunca las lee. */
+            image: components["schemas"]["CaptureUploadedImageDto"];
+            uploadCount: number;
+            maxUploads: number;
+            /** @description Avisos de calidad de la fotografía aceptada — encuadre, enfoque, luz. No bloquean nada; sirven para que quien sostiene el teléfono mejore la siguiente toma. */
+            warnings: string[];
         };
         SurveyStatusDto: {
             /** @description Si corresponde mostrar el cuestionario ahora (RF-OE3-02). */
@@ -1586,7 +2813,7 @@ export interface components {
             /** @enum {string} */
             indicator: "TRM" | "TPD" | "TSP" | "TCAD";
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
             /** @description Valor del indicador según su fórmula. */
             value: number;
             unit: string;
@@ -1627,7 +2854,7 @@ export interface components {
         };
         ClassificationReportDto: {
             /** @enum {string} */
-            studyMode: "pretest" | "postest" | "produccion";
+            studyMode: "pretest" | "postest";
             /** @description TPD = (DC / DT) × 100. */
             accuracyPct: number;
             correct: number;
@@ -1745,7 +2972,9 @@ export interface components {
             formula: string | null;
             target: string | null;
             /** @enum {string} */
-            status: "covered" | "partial" | "pending";
+            status: "cubierto" | "parcial" | "pendiente";
+            /** @description Nombre legible del estado, para pintarlo sin traducir en el portal. */
+            statusLabel: string;
             modules: string[];
             requirements: string[];
             notes: string | null;
@@ -1763,6 +2992,11 @@ export interface components {
             /** @description Solo es `true` con una CNN entrenada activa. Es la condición que permite declarar IIA = 1. */
             operational: boolean;
             modelBackend: string;
+            /**
+             * @description Por qué la verificación pasa o falla. Un stub y un LLM externo la fallan por razones que no son equivalentes, y `operational` por sí solo no las distingue.
+             * @enum {string}
+             */
+            modelKind: "stub" | "cnn" | "llm_externo";
             version: string;
             weightsChecksum: string | null;
             engineLatencyMedian24hMs: number | null;
@@ -1778,12 +3012,25 @@ export interface components {
             warnings: string[];
             checkedAt: string;
         };
+        AuditActionCountDto: {
+            /** @example patient.identity.read */
+            action: string;
+            /** @example Descifrado de identidad del paciente */
+            actionLabel: string;
+            /** @description Veces que aparece en toda la traza. */
+            count: number;
+        };
         AuditLogDto: {
             id: string;
             userId: string | null;
             userEmail: string | null;
+            /** @description Código de la acción. Es por lo que se filtra y lo que se cita. */
             action: string;
+            /** @description Nombre legible de la acción, para pintarlo sin traducir. */
+            actionLabel: string;
             entityType: string;
+            /** @description Nombre legible de la entidad tocada. */
+            entityLabel: string;
             entityId: string | null;
             ipAddress: string | null;
             userAgent: string | null;
@@ -1803,7 +3050,13 @@ export type $defs = Record<string, never>;
 export interface operations {
     UsersController_findAll: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Roles separados por comas, p. ej. `dermatologo,tecnico`. */
+                role?: string;
+                active?: boolean;
+                /** @description Coincide en nombre o correo. */
+                search?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1843,6 +3096,86 @@ export interface operations {
             };
         };
     };
+    UsersController_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponseDto"];
+                };
+            };
+        };
+    };
+    UsersController_changePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePasswordDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_acceptConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponseDto"];
+                };
+            };
+        };
+    };
+    UsersController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponseDto"];
+                };
+            };
+        };
+    };
     UsersController_update: {
         parameters: {
             query?: never;
@@ -1868,53 +3201,13 @@ export interface operations {
             };
         };
     };
-    UsersController_me: {
+    UsersController_resetPassword: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserResponseDto"];
-                };
+            path: {
+                id: string;
             };
-        };
-    };
-    UsersController_setStudyMode: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetStudyModeDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserResponseDto"];
-                };
-            };
-        };
-    };
-    UsersController_acceptConsent: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -1924,7 +3217,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserResponseDto"];
+                    "application/json": components["schemas"]["TemporaryPasswordDto"];
                 };
             };
         };
@@ -2042,6 +3335,31 @@ export interface operations {
             };
         };
     };
+    PatientsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePatientDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientResponseDto"];
+                };
+            };
+        };
+    };
     PatientsController_history: {
         parameters: {
             query?: {
@@ -2095,7 +3413,36 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WithdrawPatientDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientResponseDto"];
+                };
+            };
+        };
+    };
+    PatientsController_reinstate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReinstatePatientDto"];
+            };
+        };
         responses: {
             201: {
                 headers: {
@@ -2124,6 +3471,503 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Consent"][];
+                };
+            };
+        };
+    };
+    AnamnesisController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                caseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnamnesisResponseDto"];
+                };
+            };
+        };
+    };
+    AnamnesisController_save: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                caseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveAnamnesisDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnamnesisResponseDto"];
+                };
+            };
+        };
+    };
+    AnamnesisController_latest: {
+        parameters: {
+            query?: {
+                /** @description Caso en curso, para no ofrecerse a sí mismo como precarga. */
+                excludeCaseId?: string;
+            };
+            header?: never;
+            path: {
+                patientId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnamnesisPrefillDto"];
+                };
+            };
+        };
+    };
+    QuestionsController_findAll: {
+        parameters: {
+            query?: {
+                includeInactive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionDto"][];
+                };
+            };
+        };
+    };
+    QuestionsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateQuestionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionDto"];
+                };
+            };
+        };
+    };
+    QuestionsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    QuestionsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateQuestionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionDto"];
+                };
+            };
+        };
+    };
+    PrescriptionsController_listMedications: {
+        parameters: {
+            query?: {
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MedicationDto"][];
+                };
+            };
+        };
+    };
+    PrescriptionsController_createMedication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveMedicationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MedicationDto"];
+                };
+            };
+        };
+    };
+    PrescriptionsController_byCase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                caseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrescriptionDto"][];
+                };
+            };
+        };
+    };
+    PrescriptionsController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrescriptionDto"];
+                };
+            };
+        };
+    };
+    PrescriptionsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePrescriptionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrescriptionDto"];
+                };
+            };
+        };
+    };
+    PrescriptionsController_pdf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PrescriptionsController_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PrescriptionsController_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendPrescriptionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrescriptionDto"];
+                };
+            };
+        };
+    };
+    PrescriptionsController_annul: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrescriptionDto"];
+                };
+            };
+        };
+    };
+    PrescriptionsController_listAll: {
+        parameters: {
+            query?: {
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MedicationDto"][];
+                };
+            };
+        };
+    };
+    PrescriptionsController_updateMedication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveMedicationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MedicationDto"];
+                };
+            };
+        };
+    };
+    PrescriptionsController_seedDefaults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SignaturesController_find: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignatureDto"];
+                };
+            };
+        };
+    };
+    SignaturesController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file?: string;
+                };
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignatureDto"];
+                };
+            };
+        };
+    };
+    SignaturesController_image: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SignaturesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignatureDto"];
                 };
             };
         };
@@ -2163,7 +4007,37 @@ export interface operations {
                 "multipart/form-data": {
                     /** Format: binary */
                     file?: string;
+                    /**
+                     * @description Toma del protocolo fotográfico a la que corresponde la imagen. Sin ella la fotografía no cuenta para las tomas obligatorias.
+                     * @enum {string}
+                     */
+                    shotKey?: "general" | "acercamiento" | "borde" | "perfil_derecho" | "perfil_izquierdo" | "pecho" | "espalda" | "otra";
                 };
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadedImageDto"];
+                };
+            };
+        };
+    };
+    ImagesController_relabel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RelabelImageDto"];
             };
         };
         responses: {
@@ -2174,6 +4048,25 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["CaseImageDto"];
                 };
+            };
+        };
+    };
+    ImagesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2238,6 +4131,94 @@ export interface operations {
                 content: {
                     "application/json": Record<string, never>;
                 };
+            };
+        };
+    };
+    InferenceController_requestForCase: {
+        parameters: {
+            query?: {
+                force?: boolean;
+            };
+            header?: never;
+            path: {
+                caseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiInferenceDto"][];
+                };
+            };
+        };
+    };
+    InferenceController_caseAnalysis: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                caseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseAnalysisDto"];
+                };
+            };
+        };
+    };
+    InferenceController_chooseReading: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                caseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChooseReadingDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseReadingSelectionDto"];
+                };
+            };
+        };
+    };
+    InferenceController_withdrawReading: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                caseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2500,8 +4481,8 @@ export interface operations {
     CasesController_findAll: {
         parameters: {
             query?: {
-                studyMode?: "pretest" | "postest" | "produccion";
-                status?: "draft" | "in_review" | "ai_processed" | "diagnosed" | "closed";
+                studyMode?: "pretest" | "postest";
+                status?: "borrador" | "en_revision" | "procesado_ia" | "solicitar_fotos" | "derivar_presencial" | "diagnosticado" | "cerrado";
                 mine?: boolean;
                 includeSynthetic?: boolean;
                 /** @description Deja solo los casos que aún no tienen medición bajo la condición actual del usuario. Es la bandeja de trabajo real: primero la pasada de pretest sobre los 30 casos, después la de postest sobre esos mismos 30. */
@@ -2632,6 +4613,193 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CaseSummaryDto"];
+                };
+            };
+        };
+    };
+    CasesController_requestPhotos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaseReturnDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseDetailDto"];
+                };
+            };
+        };
+    };
+    CasesController_resubmit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseDetailDto"];
+                };
+            };
+        };
+    };
+    CasesController_refer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaseReturnDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseDetailDto"];
+                };
+            };
+        };
+    };
+    CaptureController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCaptureSessionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaptureSessionCreatedDto"];
+                };
+            };
+        };
+    };
+    CaptureController_active: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                caseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaptureSessionStatusDto"];
+                };
+            };
+        };
+    };
+    CaptureController_revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaptureSessionStatusDto"];
+                };
+            };
+        };
+    };
+    CaptureController_context: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaptureSessionContextDto"];
+                };
+            };
+        };
+    };
+    CaptureController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file?: string;
+                    /** @enum {string} */
+                    shotKey?: "general" | "acercamiento" | "borde" | "perfil_derecho" | "perfil_izquierdo" | "pecho" | "espalda" | "otra";
+                };
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaptureUploadResultDto"];
                 };
             };
         };
@@ -2912,7 +5080,7 @@ export interface operations {
     StatsController_exportDataset: {
         parameters: {
             query?: {
-                dataset?: "mediciones" | "tiempos" | "diagnosticos" | "jornadas" | "encuestas";
+                dataset?: "mediciones" | "tiempos" | "diagnosticos" | "jornadas" | "encuestas" | "anamnesis";
                 includeSynthetic?: boolean;
             };
             header?: never;
@@ -3024,6 +5192,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IiaCheckDto"];
+                };
+            };
+        };
+    };
+    AuditApiController_logActions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditActionCountDto"][];
                 };
             };
         };

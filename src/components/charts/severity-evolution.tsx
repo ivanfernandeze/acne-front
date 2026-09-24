@@ -10,7 +10,6 @@ import {
   YAxis,
 } from 'recharts';
 
-import { useTheme } from '@/components/theme-provider';
 import { date } from '@/lib/format';
 
 /**
@@ -38,23 +37,16 @@ export interface SeverityPoint {
   caseCode: string;
 }
 
-const PALETTE = {
-  light: {
-    line: '#0e7490', // cyan-700
-    dot: '#0f172b', // slate-900
-    grid: '#e2e8f0', // slate-200
-    tick: '#62748e', // slate-500
-    surface: '#ffffff',
-    text: '#0f172b', // slate-900
-  },
-  dark: {
-    line: '#00b8db', // cyan-500
-    dot: '#f1f5f9', // slate-100
-    grid: '#314158', // slate-700
-    tick: '#90a1b9', // slate-400
-    surface: '#0f172b', // slate-900
-    text: '#f1f5f9', // slate-100
-  },
+const COLORS = {
+  line: '#6d28d9', // violet-700
+  dot: '#171717', // neutral-900
+  grid: '#e5e5e5', // neutral-200
+  tick: '#737373', // neutral-500
+  // The halo of each point: it must match what the chart sits on, so the dot reads as cut out of
+  // the surface. The tooltip stays a separate key because it floats above that surface.
+  surface: '#ffffff',
+  tooltip: '#ffffff',
+  text: '#171717', // neutral-900
 } as const;
 
 export function SeverityEvolution({
@@ -67,12 +59,11 @@ export function SeverityEvolution({
   rankLabels: Record<number, string>;
   height?: number;
 }) {
-  const { resolved } = useTheme();
-  const colors = PALETTE[resolved];
+  const colors = COLORS;
 
   if (data.length < 2) {
     return (
-      <p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">
+      <p className="py-10 text-center text-sm text-neutral-500">
         Se necesitan al menos dos visitas con diagnóstico para trazar la evolución.
       </p>
     );
@@ -102,7 +93,7 @@ export function SeverityEvolution({
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: colors.surface,
+            backgroundColor: colors.tooltip,
             border: `1px solid ${colors.grid}`,
             borderRadius: 8,
             fontSize: 12,

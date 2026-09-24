@@ -6,7 +6,7 @@
  * be left readable in a browser cache on a shared or lost phone (RNF-02, Ley N.º 29733).
  */
 
-const CACHE_VERSION = 'acne-shell-v1';
+const CACHE_VERSION = 'acne-shell-v2';
 const SHELL = ['/app', '/app/captura', '/app/historial', '/manifest.json'];
 
 self.addEventListener('install', (event) => {

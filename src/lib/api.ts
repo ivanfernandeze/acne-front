@@ -11,7 +11,27 @@ import type { paths } from '@/types/api-schema';
  * schema. If the backend changes a field, `pnpm typecheck` fails here.
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
+/**
+ * Where the API lives, from the point of view of the device running this code.
+ *
+ * A hard-coded `localhost` breaks the whole mobile capture flow: the phone that scans the QR
+ * resolves `localhost` to itself, not to the clinic's machine. When no explicit URL is configured,
+ * the API is assumed to sit on the same host the portal was served from — which is exactly right
+ * both on the developer's laptop and on a LAN address like `http://192.168.1.50:3000`.
+ */
+function resolveBaseUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_API_URL;
+  if (configured !== undefined && configured !== '') return configured;
+  if (typeof window === 'undefined') return 'http://localhost:3001/api';
+  return `${window.location.protocol}//${window.location.hostname}:3001/api`;
+}
+
+/**
+ * Alias of `resolveBaseUrl`, called at request time rather than cached at module load: the module
+ * is first evaluated during prerender, where there is no `window`, and freezing that answer would
+ * pin every later request to `localhost`.
+ */
+const baseUrl = resolveBaseUrl;
 
 const ACCESS_TOKEN_KEY = 'acne.accessToken';
 const REFRESH_TOKEN_KEY = 'acne.refreshToken';
@@ -33,7 +53,7 @@ type OkResponse<T> = T extends { responses: infer R }
 
 /**
  * The OpenAPI document keys every route with the API's global prefix (`/api/auth/login`), while
- * this client carries that prefix in `BASE_URL` and calls the route as `/auth/login`. This alias
+ * this client carries that prefix in its base URL and calls the route as `/auth/login`. This alias
  * bridges the two so call sites stay short AND still resolve against the generated schema.
  */
 type Prefixed<P extends string> = `/api${P}` extends keyof paths ? `/api${P}` : never;
@@ -116,7 +136,7 @@ export class ApiError extends Error {
 // --- Core -------------------------------------------------------------------
 
 interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
   /** Multipart upload; `body` must be a FormData. */
   formData?: FormData;
@@ -138,7 +158,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
   let response: Response;
   try {
-    response = await fetch(`${BASE_URL}${path}`, {
+    response = await fetch(`${baseUrl()}${path}`, {
       method: options.method ?? 'GET',
       headers,
       body,
@@ -147,7 +167,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   } catch (error) {
     throw new ApiError(
       0,
-      `No se pudo contactar con la API en ${BASE_URL}. Verifique que acne-api esté levantado.`,
+      `No se pudo contactar con la API en ${baseUrl()}. Verifique que acne-api esté levantado.`,
       error,
     );
   }
@@ -202,6 +222,8 @@ export const api = {
   post: <T>(path: string, body?: unknown): Promise<T> =>
     request<T>(path, { method: 'POST', body }),
 
+  put: <T>(path: string, body?: unknown): Promise<T> => request<T>(path, { method: 'PUT', body }),
+
   patch: <T>(path: string, body?: unknown): Promise<T> =>
     request<T>(path, { method: 'PATCH', body }),
 
@@ -209,12 +231,12 @@ export const api = {
     request<T>(path, { method: 'POST', formData }),
 
   /** Absolute URL for a resource the browser loads directly (images, PDFs, CSV). */
-  url: (path: string): string => `${BASE_URL}${path}`,
+  url: (path: string): string => `${baseUrl()}${path}`,
 
   /** Downloads a binary resource with the bearer token attached. */
   async download(path: string, filename: string): Promise<void> {
     const session = readSession();
-    const response = await fetch(`${BASE_URL}${path}`, {
+    const response = await fetch(`${baseUrl()}${path}`, {
       headers: session === null ? {} : { Authorization: `Bearer ${session.accessToken}` },
     });
     if (!response.ok) {

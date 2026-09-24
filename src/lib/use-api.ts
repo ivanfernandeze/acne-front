@@ -69,6 +69,44 @@ export function useApi<T>(
 }
 
 /**
+ * Reloads on an interval, for the desktop watching photographs arrive from a phone.
+ *
+ * Polling rather than a socket: the portal has exactly one screen that needs live updates, for the
+ * few minutes a capture session is open, and a WebSocket server would be infrastructure the study
+ * has to run, secure and explain for that one panel.
+ *
+ * It stops while the tab is hidden — the receptionist switches away constantly and there is no
+ * reason to keep hitting the API from a screen nobody is looking at — and resumes on focus.
+ */
+export function usePolledApi<T>(
+  path: string | null,
+  query?: QueryParams,
+  intervalMs = 3000,
+): AsyncState<T> {
+  const state = useApi<T>(path, query);
+  const { reload } = state;
+
+  useEffect(() => {
+    if (path === null || intervalMs <= 0) return;
+
+    const tick = (): void => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
+      reload();
+    };
+
+    const timer = setInterval(tick, intervalMs);
+    // A tab coming back into view should refresh immediately rather than wait out the interval.
+    document.addEventListener('visibilitychange', tick);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', tick);
+    };
+  }, [path, intervalMs, reload]);
+
+  return state;
+}
+
+/**
  * Delays a fast-changing value, for search boxes.
  *
  * Without it every keystroke fires a request and the results area blanks out mid-word, which on a
