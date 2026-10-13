@@ -3,7 +3,7 @@
 import { ArrowLeft, Brain, Camera, CheckCircle2, ImageOff, RefreshCw, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { AiAssessment } from '@/components/portal/ai-assessment';
 import { AnamnesisMismatchAlert } from '@/components/portal/anamnesis-mismatch-alert';
@@ -25,6 +25,8 @@ import { Badge, StudyModeBadge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Alert, ErrorState, Loading, StudyModeBlocked } from '@/components/ui/feedback';
+import { useToast } from '@/components/ui/toast';
+import { describeNoAcne } from '@/lib/acne-verdict';
 import { api, ApiError, type GetResult, type PostResult } from '@/lib/api';
 import { date, num, pct } from '@/lib/format';
 import { listShotLabels, shotLabel } from '@/lib/shots';
@@ -163,6 +165,19 @@ export default function CasoDetallePage() {
       statusLabel: catalogs?.caseStatuses.labels[entry.status] ?? entry.status,
     }));
 
+  // Tomas que el filtro del motor declaró sin acné. Aviso flotante una vez por resultado (aquí,
+  // con los hooks: debajo hay retornos tempranos) y nota fija en la tarjeta de la IA.
+  const noAcne =
+    detail !== null && detail.aiVisible
+      ? describeNoAcne(detail.caseAnalysis, catalogs?.shots?.definitions ?? [])
+      : null;
+  const { notify } = useToast();
+  const notifiedNoAcne = useRef<string | null>(null);
+  useEffect(() => {
+    if (noAcne === null || notifiedNoAcne.current === noAcne.key) return;
+    notifiedNoAcne.current = noAcne.key;
+    notify({ tone: 'warning', title: noAcne.title, message: noAcne.message });
+  }, [noAcne, notify]);
 
   if (loading) return <Loading label="Abriendo la ficha del caso…" />;
   if (error !== null) return <ErrorState message={error.message} onRetry={() => void open()} />;
@@ -184,6 +199,8 @@ export default function CasoDetallePage() {
     detail.caseAnalysis !== null && detail.caseAnalysis.igaClass !== null
       ? detail.caseAnalysis
       : null;
+  // Ninguna toma muestra acné: no hay clase que sugerir ni que marcar en el formulario.
+  const noSuggestion = detail.caseAnalysis?.verdict === 'no_acne';
   const activeHeatmapId = heatmapId ?? detail.inference?.heatmapImageId ?? null;
   const heatmap = detail.images.find(
     (image) => image.isHeatmap && image.id === activeHeatmapId,
@@ -456,28 +473,45 @@ export default function CasoDetallePage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="flex flex-wrap items-end gap-4">
-                    <div>
-                      <p className="text-xs text-neutral-500">
-                        {caseSuggestion !== null ? 'Clase IGA sugerida para el caso' : 'Clase IGA sugerida'}
-                      </p>
-                      <p className="text-2xl font-bold text-violet-700">
-                        {igaLabel(catalogs, caseSuggestion?.igaClass ?? detail.inference.igaClass)}
-                      </p>
+                  {noAcne !== null ? (
+                    <Alert
+                      tone="warning"
+                      title={noSuggestion ? 'Sin sugerencia de IA' : noAcne.title}
+                    >
+                      {noAcne.message}
+                    </Alert>
+                  ) : null}
+                  {detail.caseAnalysis?.verdict === 'piel_sana' ? (
+                    <Alert tone="info" title="Sugerencia del filtro de piel sana">
+                      Ninguna toma muestra acné: la clase «Sin lesiones» la sugiere el filtro
+                      previo, que reconoce la piel sana (pecas incluidas). Los modelos IGA no se
+                      ejecutaron.
+                    </Alert>
+                  ) : null}
+                  {noSuggestion ? null : (
+                    <div className="flex flex-wrap items-end gap-4">
+                      <div>
+                        <p className="text-xs text-neutral-500">
+                          {caseSuggestion !== null ? 'Clase IGA sugerida para el caso' : 'Clase IGA sugerida'}
+                        </p>
+                        <p className="text-2xl font-bold text-violet-700">
+                          {igaLabel(catalogs, caseSuggestion?.igaClass ?? detail.inference.igaClass)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-neutral-500">Confianza</p>
+                        <p className="text-xl font-semibold tabular-nums text-neutral-900">
+                          {(caseSuggestion?.confidence ?? detail.inference.confidence) === null
+                            ? '—'
+                            : pct((caseSuggestion?.confidence ?? detail.inference.confidence ?? 0) * 100)}
+                        </p>
+                      </div>
+                      <div className="ml-auto text-right text-xs text-neutral-500">
+                        <p>GAGS: {detail.inference.gagsScore ?? '—'}</p>
+                        <p>{detail.inference.latencyMs ?? '—'} ms</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-neutral-500">Confianza</p>
-                      <p className="text-xl font-semibold tabular-nums text-neutral-900">
-                        {(caseSuggestion?.confidence ?? detail.inference.confidence) === null
-                          ? '—'
-                          : pct((caseSuggestion?.confidence ?? detail.inference.confidence ?? 0) * 100)}
-                      </p>
-                    </div>
-                    <div className="ml-auto text-right text-xs text-neutral-500">
-                      <p>GAGS: {detail.inference.gagsScore ?? '—'}</p>
-                      <p>{detail.inference.latencyMs ?? '—'} ms</p>
-                    </div>
-                  </div>
+                  )}
 
                   {detail.inference.classProbs !== null ? (
                     <div className="space-y-1.5">
@@ -616,7 +650,13 @@ export default function CasoDetallePage() {
           ) : (
             <DiagnosisForm
               caseId={detail.id}
-              aiSuggestion={detail.aiVisible ? (detail.inference?.igaClass ?? null) : null}
+              aiSuggestion={
+                // La clase del caso, como la que el servidor contrasta al firmar; nula cuando
+                // ninguna toma mostró acné.
+                detail.aiVisible && !noSuggestion
+                  ? (caseSuggestion?.igaClass ?? detail.inference?.igaClass ?? null)
+                  : null
+              }
               blockedReason={protocolBlockedReason}
               mismatch={detail.anamnesisMismatch}
               onSubmitted={() => {

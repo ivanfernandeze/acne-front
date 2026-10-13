@@ -178,7 +178,26 @@ export function CaseAnalysisMatrix({
                       </span>
                     ) : null}
                   </td>
-                  {memberTags.map((tag) => {
+                  {view.inference.verdict === 'no_acne' ? (
+                    <td colSpan={memberTags.length + 1} className="py-1.5 pr-3 text-amber-700">
+                      Otra condición según el filtro: no se graduó
+                      {view.inference.acneProbability !== null ? (
+                        <span className="block text-[11px] tabular-nums text-neutral-500">
+                          Probabilidad de acné {pct(view.inference.acneProbability * 100)}
+                        </span>
+                      ) : null}
+                    </td>
+                  ) : null}
+                  {/* Piel sana: los modelos IGA no corrieron; la lectura (sin lesiones) es del
+                      filtro, y se puede elegir como cualquier otra en la columna Ensemble. */}
+                  {view.inference.verdict === 'piel_sana' && memberTags.length > 0 ? (
+                    <td colSpan={memberTags.length} className="py-1.5 pr-3 text-emerald-700">
+                      Piel sana según el filtro (los modelos IGA no se ejecutaron)
+                    </td>
+                  ) : null}
+                  {view.inference.verdict === 'no_acne' || view.inference.verdict === 'piel_sana'
+                    ? null
+                    : memberTags.map((tag) => {
                     const member = members.find((m) => m.tag === tag);
                     return (
                       <td key={tag} className="py-1.5 pr-3">
@@ -194,24 +213,30 @@ export function CaseAnalysisMatrix({
                       </td>
                     );
                   })}
-                  <td className="py-1.5 pr-3 font-semibold">
-                    {cell(
-                      view,
-                      view.inference.igaClass,
-                      view.inference.confidence,
-                      view.inference.heatmapImageId,
-                      null,
-                    )}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setExpanded((current) => (current === view.imageId ? null : view.imageId))
-                      }
-                      className="mt-1 block text-[11px] font-normal text-violet-700 underline-offset-2 hover:underline"
-                    >
-                      {expanded === view.imageId ? 'ocultar cálculo' : 'ver cálculo'}
-                    </button>
-                  </td>
+                  {view.inference.verdict === 'no_acne' ? null : (
+                    <td className="py-1.5 pr-3 font-semibold">
+                      {cell(
+                        view,
+                        view.inference.igaClass,
+                        view.inference.confidence,
+                        view.inference.heatmapImageId,
+                        null,
+                      )}
+                      {view.inference.verdict === 'piel_sana' ? null : (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setExpanded((current) =>
+                              current === view.imageId ? null : view.imageId,
+                            )
+                          }
+                          className="mt-1 block text-[11px] font-normal text-violet-700 underline-offset-2 hover:underline"
+                        >
+                          {expanded === view.imageId ? 'ocultar cálculo' : 'ver cálculo'}
+                        </button>
+                      )}
+                    </td>
+                  )}
                 </tr>
               );
             })}

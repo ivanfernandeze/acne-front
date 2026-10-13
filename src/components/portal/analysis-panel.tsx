@@ -1,7 +1,7 @@
 'use client';
 
 import { AlertTriangle, Brain, CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { AiAssessment } from '@/components/portal/ai-assessment';
 import { AnamnesisMismatchAlert } from '@/components/portal/anamnesis-mismatch-alert';
@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Alert } from '@/components/ui/feedback';
+import { useToast } from '@/components/ui/toast';
+import { describeNoAcne } from '@/lib/acne-verdict';
 import { api, type GetResult, type PostResult } from '@/lib/api';
 import { num, pct } from '@/lib/format';
 import { listShotLabels, type ShotDefinitionLike } from '@/lib/shots';
@@ -109,6 +111,19 @@ export function AnalysisPanel({
   });
 
   const protocolIncomplete = missingShots.length > 0;
+
+  // Las tomas que el filtro del motor declaró sin acné: aviso flotante una vez por resultado, y
+  // nota fija en el panel, porque el aviso se cierra solo y quien vuelva al caso tiene que saber
+  // por qué no hay sugerencia.
+  const noAcne = done ? describeNoAcne(current, catalogs?.shots.definitions ?? []) : null;
+  const { notify } = useToast();
+  const notified = useRef<string | null>(null);
+  useEffect(() => {
+    if (noAcne === null || notified.current === noAcne.key) return;
+    notified.current = noAcne.key;
+    notify({ tone: 'warning', title: noAcne.title, message: noAcne.message });
+  }, [noAcne, notify]);
+  const noSuggestion = current?.verdict === 'no_acne';
 
   // The mismatch between questionnaire and image is derived by the server from the finished
   // inference, so the case file is re-read once there is one.
@@ -209,27 +224,40 @@ export function AnalysisPanel({
         {done && current !== null ? (
           <div className="space-y-4">
             <AnamnesisMismatchAlert messages={mismatch} />
-            <div className="flex flex-wrap items-end gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
-                <CheckCircle2 className="h-5 w-5" aria-hidden />
-              </span>
-              <div>
-                <p className="text-xs text-neutral-500">Clase IGA sugerida para el caso</p>
-                <p className="text-2xl font-bold text-violet-700">
-                  {igaLabel(catalogs, current.igaClass)}
-                </p>
+            {noAcne !== null ? (
+              <Alert tone="warning" title={noSuggestion ? 'Sin sugerencia de IA' : noAcne.title}>
+                {noAcne.message}
+              </Alert>
+            ) : null}
+            {current.verdict === 'piel_sana' ? (
+              <Alert tone="info" title="Sugerencia del filtro de piel sana">
+                Ninguna toma muestra acné: la clase «Sin lesiones» la sugiere el filtro previo, que
+                reconoce la piel sana (pecas incluidas). Los modelos IGA no se ejecutaron.
+              </Alert>
+            ) : null}
+            {noSuggestion ? null : (
+              <div className="flex flex-wrap items-end gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                  <CheckCircle2 className="h-5 w-5" aria-hidden />
+                </span>
+                <div>
+                  <p className="text-xs text-neutral-500">Clase IGA sugerida para el caso</p>
+                  <p className="text-2xl font-bold text-violet-700">
+                    {igaLabel(catalogs, current.igaClass)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-neutral-500">Confianza</p>
+                  <p className="text-xl font-semibold tabular-nums text-neutral-900">
+                    {current.confidence === null ? '—' : pct(current.confidence * 100)}
+                  </p>
+                </div>
+                <div className="ml-auto text-right text-xs text-neutral-500">
+                  <p>{current.completed} toma(s) analizadas</p>
+                  <p>GAGS: {latest?.gagsScore ?? '—'}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-neutral-500">Confianza</p>
-                <p className="text-xl font-semibold tabular-nums text-neutral-900">
-                  {current.confidence === null ? '—' : pct(current.confidence * 100)}
-                </p>
-              </div>
-              <div className="ml-auto text-right text-xs text-neutral-500">
-                <p>{current.completed} toma(s) analizadas</p>
-                <p>GAGS: {latest?.gagsScore ?? '—'}</p>
-              </div>
-            </div>
+            )}
 
             {current.classProbs !== null && current.classProbs !== undefined ? (
               <div className="space-y-1.5">

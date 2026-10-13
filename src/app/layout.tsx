@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
 
 import { SessionProvider } from '@/components/session-provider';
+import { ToastProvider } from '@/components/ui/toast';
 
 import './globals.css';
 
@@ -50,7 +51,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es-PE" className={inter.variable}>
       <body className="min-h-screen bg-neutral-50 font-(family-name:--font-inter) text-neutral-900 antialiased">
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </SessionProvider>
       </body>
     </html>
   );

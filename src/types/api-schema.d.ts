@@ -2297,6 +2297,13 @@ export interface components {
             imageId: string;
             /** @enum {string} */
             status: "pendiente" | "ejecutando" | "exitoso" | "fallido";
+            /**
+             * @description `acne`: graduada por el ensemble IGA. `piel_sana`: el filtro vio piel sana (pecas incluidas) y la lectura es `sin_lesiones` con la probabilidad DEL FILTRO; el ensemble no corrió (sin miembros ni Grad-CAM). `no_acne`: otra condición (vitíligo, psoriasis…); no se graduó y `igaClass`, `classProbs` y el GAGS son nulos aunque `status` sea `exitoso`.
+             * @enum {string}
+             */
+            verdict: "acne" | "piel_sana" | "no_acne";
+            /** @description Probabilidad de acné según el filtro; nula si el motor no tenía filtro. */
+            acneProbability: number | null;
             /** @enum {string|null} */
             igaClass: "sin_lesiones" | "casi_sin_lesiones" | "leve" | "moderado" | "severo" | null;
             confidence: number | null;
@@ -2380,6 +2387,13 @@ export interface components {
                 min?: string;
                 max?: string;
             } | null;
+            /**
+             * @description Veredicto del caso. `no_acne`: ninguna toma muestra acné ni piel sana (otra condición) y no hay sugerencia de grado; el portal lo avisa como incongruencia. `piel_sana`: todas las tomas graduables son piel sana y la sugerencia `sin_lesiones` viene del filtro. `acne`: al menos una toma se graduó con el ensemble. Nulo mientras no termina ninguna toma.
+             * @enum {string|null}
+             */
+            verdict: "acne" | "piel_sana" | "no_acne" | null;
+            /** @description imageId de las tomas que el filtro declaró «otra condición». Quedan fuera de la sugerencia del caso. Las tomas de piel sana SÍ participan, como `sin_lesiones`. */
+            noAcneViews: string[];
             /** @description Tomas con inferencia terminada con éxito. */
             completed: number;
             /** @description Tomas con inferencia pendiente o en ejecución. */
